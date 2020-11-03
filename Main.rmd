@@ -1,0 +1,1278 @@
+---
+title: "R CheatSheet for ADS2-2020"
+author: YU Zhejian
+date: 23/10/2020
+geometry: inner=0.5in,outer=0.5in
+output:
+  html_notebook:
+    toc: true
+    toc_depth: 5
+  pdf_document:
+    toc: true
+    number_sections: true
+    toc_depth: 5
+    keep_tex: true
+    includes:
+      in_header: headers.tex
+---
+
+![YuZJLab_BG](YuZJLab_BG.png)
+
+# Advertisements
+
+## Writing RMarkDown Using IntelliJ-based IDEs
+
+The [R plugin](https://www.jetbrains.com/help/pycharm/r-plugin-support.html) for IntelliJ-based IDEs provides handy capabilities to work with the [R Markdown](https://www.jetbrains.com/help/pycharm/r-markdown.html) files.
+To [add](https://www.jetbrains.com/help/pycharm/r-markdown.html#add-code-chunk) a new R chunk, position the caret at any line or the code chunk, then click "+".
+
+The code chunk appears:
+
+```{r, eval = FALSE}
+rm(list = ls())
+```
+
+Type any R code in the chunk, for example:
+
+```{r}
+rm(list = ls())
+seq(1, 10, by = 2)
+```
+
+Now, click the **Run** button on the chunk toolbar to [execute](https://www.jetbrains.com/help/pycharm/r-markdown.html#run-r-code) the chunk code. The result should be placed under the chunk. Click the **Knit and Open Document** to built and preview an output.
+
+## Another piece of advertisement
+
+`awk` is the best statistical language in the word.
+
+# Global Libraries
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+data("mpg")
+```
+
+# R Data Types
+
+## Vector
+
+### Generate or combine a vector by `c()` or `seq()`
+
+```{text}
+c(x...)
+
+Args:
+    x <- vectors.
+        Return/Accept: vectors <- c
+    x <- none-vector objects.
+        Return/Accept: list <- c
+
+seq(from, to, by = 1)
+
+Args: Omitted.
+
+Return/Accept: vectors <- seq
+```
+
+```{r}
+rm(list = ls())
+a <- seq(1, 10, by = 2) # Generate a vector.
+a
+b <- c(1, 10)
+b
+c <- c(a, b)
+c # Link those vectors together.
+a <- data.frame(1:5, 6:10)
+c <- c(a, b)
+c # This gives a list.
+```
+
+## Matrices
+
+### Generate a matrix by `matrix()`
+
+```{text}
+matrix(data = NA, nrow = 1, ncol = 1, byrow = FALSE)
+Args:
+    data <- vector. The data used.
+    nrow <- integral. Number of rows.
+    ncol <- integral. Number of columns.
+    byrow <- logic. Fill by row or column.
+```
+
+```{r}
+rm(list = ls())
+a <- matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3)
+a
+a <- matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3, byrow = TRUE)
+a
+```
+
+### Access an element by `name[row,col]`
+
+```{r}
+a[1, 1]
+a[1,]
+a[, 1]
+a[, c(1, 3)]
+a[1]
+# row or col can also be vector of logicals
+a[c(TRUE, FALSE),]
+a[a[, 1] > 5,]
+```
+
+## DataFrame
+
+### Generate a dataframe by `data.frame()`
+
+```{text}
+data.frame(x..., stringsAsFactors = default.stringsAsFactors())
+Args:
+    x... <- data. usually in a form of col_name=value(vector).
+    stringsAsFactors <- Omitted.
+```
+
+```{r}
+rm(list = ls())
+a <- data.frame(x1 = 1:5, x2 = 6:10)
+a
+```
+
+### Access can be done by `name[row,col]` \& `name$col_name`
+
+```{r}
+a$x1
+```
+
+### Get/Set column names by `names()`
+
+```{text}
+names(x)
+
+Args:
+    x <- Dataframe/List
+
+Return/Accept: vector (Name now) <- names <- vector (Name to set)
+```
+
+```{r}
+rm(list = ls())
+a <- c("l1", "l2") # a is a vector
+names(a)
+a <- data.frame(1:5, 6:10) # a is a dataframe
+names(a)
+names(a) <- c("l1", "l2")
+names(a)
+a <- list(one = 1, two = c(1, 2), five = seq(0, 1, length = 5))
+names(a)
+names(a) <- c("l1", "l2", "l3")
+names(a)
+```
+
+### Bind dataframes by `rbind()` \& `cbind()` \& `merge`
+
+```{r}
+rm(list = ls())
+a <- data.frame(1:5, 6:10)
+b <- data.frame(11:15, 16:20)
+c <- cbind(a, b)
+c
+# This line makes the column name of a and b identical
+names(b) <- names(a)
+d <- rbind(a, b)
+d
+a <- data.frame(idx=c(1:5), x=c(6:10),ab = c(11:15))
+b <- data.frame(idx=c(1:5), y=c(16:20),ab = c(13:17))
+merge(a,b,by = "idx")
+merge(a,b,by="ab")
+```
+
+## List
+
+### Generate a list by `list()`
+
+```{text}
+list(x...)
+Args:
+    x... <- data. usually in a form of item_name=value(R Object).
+```
+
+```{r}
+rm(list = ls())
+a <- list(x1 = c(1:5), x2 = data.frame(df1 = 1:5, df2 = 6:10))
+a
+```
+
+### Access members by `name[[item_index]]` or `name$item_name`
+
+Omitted.
+
+## function
+
+```{text}
+function_name <- function (aglist) {
+    ...
+    return(XXX)
+}
+```
+
+```{r}
+rm(list = ls())
+dice <- function(max) { return(sample(c(1:max), 1, replace = FALSE)); }
+a <- dice(6)
+a
+```
+
+## Conversions between datatypes: `as.*` functions
+
+## Determining datatypes: `is.*` functions
+
+# Preparing to Work
+
+## Cleanup
+
+Remove all variables \& functions inside the memory and turn off all graphical devices.
+
+```{r}
+rm(list = ls())
+dev.off()
+```
+
+## Working Directory
+
+Set the working directory by `setwd()`.
+
+```{text}
+setwd(x)
+Args:
+    x <- character. Where to go.
+Return/Accept: character (Where we are) <- setwd
+```
+
+Get the working directory by `getwd()`.
+
+```{text}
+getwd()
+Return/Accept: character (Where we are) <- getwd
+```
+
+```{r,eval = FALSE}
+rm(list = ls())
+setwd('~/Documents')
+getwd()
+```
+
+## Package Management
+
+### Package management by commands in `base`
+
+#### Installation by `install.packages()`.
+
+```{text}
+install.packages(x, repos=getOption("repos"), method = "auto")
+
+Args:
+    x<-character One package only
+    x<-vector(character) Multiple Packages
+    repos <- character. The URL you want to use. If [BLANK], will ask.
+    method <- referr2 download.file()
+
+Return/Accept: NULL <- install.packages
+```
+
+```{r,eval=FALSE}
+rm(list = ls())
+a <- install.packages("viridis", repos = "https://cloud.r-project.org")
+```
+
+#### Upgrade by `update.packages()`
+
+```{text}
+update.packages(repos=getOption("repos"), method = "auto", ask = TRUE)
+
+Args:
+    repos <- referr2 install.packages()
+    method <- referr2 install.packages()
+    ask <- logical. Whether to ask before upgrading every package.
+
+Return/Accept: referr2 install.packages()
+```
+
+```{r,eval=FALSE}
+rm(list = ls())
+update.packages(ask = FALSE)
+```
+
+#### Loading a package by `library()`
+
+```{r,eval=FALSE}
+# Load tidyverse
+library(tidyverse)
+```
+
+### Package Management by `devtools` & `git2r`
+
+`install_*()` reinstalls the package, detaches the currently loaded version then reloads the new version with `library()`.
+
+`build()` builds a package file from package sources. You can use it to build a binary version of your package.
+
+```{r,eval=FALSE}
+# Firstly we clone dplyr into our local folder `dplyr`.
+git2r::clone("https://github.com/tidyverse/dplyr/", "dplyr")
+devtools::install("dplyr") # Install dplyr
+# Equals to:
+devtools::install_github("tidyverse/dplyr")
+```
+
+You may also install packages by `install_bitbucket()` & `install_github()` & `install_gitlab()` & `install_git()` & `install_svn()` & `install_url()`.
+
+`update_packages()` updates a package to the latest version. This works both on packages installed from CRAN as well as those installed from any of the `install_*` functions. **NOTICE: Build on source by default.**
+
+### Package Management by `BioConductor`
+
+`Bioconductor` <http://www.bioconductor.org/> provides tools for the analysis and comprehension of high-throughput genomic data. Bioconductor uses the R statistical programming language, and is open source and open development. It has two releases each year, and an active user community.
+
+e.g. install `biomaRt` by `BioConductor`:
+
+```{r,eval=FALSE}
+install.packages("BiocManager")
+BiocManager::install("biomaRt")
+# Update:
+BiocManager::install(update = TRUE, ask = FALSE)
+```
+
+# File Read/Write
+
+## File download
+
+### File download by `downloader` package
+
+```{r,eval=FALSE}
+# Download an R file:
+# (We may use http://sf.R as filename)
+downloader::download("http://sf.R")
+# Source an R file:
+downloader::source_url("http://sf.R")
+```
+
+### File download by `download.file()`
+
+```{text}
+download.file(url, destfile, method, quiet = FALSE, mode = "w")
+
+Args:
+    url <- character. The URL to download.
+    destfile <- character. Where the downloaded file is saved.
+    method <- character. Downloading method to use.
+        It actually calls `download.file()`.
+        Avail: libcurl (Default), wget, curl ...
+        ERR: If external libcurl corrupts, you will get segmental fault.
+    quite <- logical. Whether to supress output.
+    mode <- character. The mode with which to write the file. Useful
+    values are "w", "wb" (binary), "a" (append) and "ab". Not used for
+    methods "wget" and "curl". See also ‘Details’, notably about using
+    "wb" for Windows.
+```
+
+## Write data by `write.*` functions
+
+```{text}
+write.table(x, file = "", append = FALSE, quote = TRUE, sep = " ", eol = "\n",
+na = "NA", dec = ".", row.names = TRUE, col.names = TRUE, fileEncoding = "")
+
+Args:
+    x <- dataframe/matrix to write.
+    file <- character. File to read.
+    append <- logical. Add at bottom or overwrite the file.
+    qutoe <- logical. Field may wrapped by quotation marks.
+    sep <- character. Field separator.
+    eol <- character. End-of-line character.
+    na <- character. How to write NA.
+    dec <- character. Demical sign.
+    row.names <- logical. Write row names or not.
+    row.names <- vector. What to erite as rwo names.
+    col.names <- referr2 row.names.
+    fileEncoding <- ?
+```
+
+```{r}
+rm(list = ls())
+write.table(mpg, file = "mpg.tsv", sep = "\t")
+```
+
+## Read data by `read.*` functions
+
+```{text}
+read.table(file, header = FALSE, sep = "", quote = "\"'", dec = ".",
+blank.lines.skip = TRUE, na.strings = "NA", comment.char = "#",
+allowEscapes = FALSE, fileEncoding = "", encoding = "unknown",
+stringsAsFactors = default.stringsAsFactors())
+
+read.csv <- read.table(file, header = TRUE, sep = ",", quote = "\"",
+dec = ".", fill = TRUE, comment.char = "", ...)
+
+read.csv2 <- read.table(file, header = TRUE, sep = ";", quote = "\"",
+dec = ",", fill = TRUE, comment.char = "", ...)
+
+read.delim <- read.table(file, header = TRUE, sep = "\t", quote = "\"",
+dec = ".", fill = TRUE, comment.char = "", ...)
+
+read.delim2 <- read.table(file, header = TRUE, sep = "\t", quote = "\"",
+dec = ",", fill = TRUE, comment.char = "", ...)
+
+Args:
+    file <- referr2 write.tables
+    header <- logical. Whether to read 1st line as header (column name).
+    sep <- referr2 write.tables
+    qutoe <- referr2 write.tables
+    dec <- referr2 write.tables
+    blank.lines.skip <- logical. Skip blank lines.
+    na.strings <- character. Strings for NA.
+    comment.char <- charater. Skip lines leading by this.
+    allowEscapes <- logical. Allow escaping character.
+    fileEncoding <- referr2 write.tables
+    encoding <- ?
+    stringsAsFactors <- logical. Convert strings to factors.
+
+Return/Accept: dataframe <- read.table
+```
+
+```{r}
+rm(list = ls())
+a <- read.delim("mpg.tsv")
+head(a)
+unlink("mpg.tsv")
+```
+
+## Package `readr` (FAILED)
+
+As a sub-package of `tidyverse`, `readr` provides a fast and friendly way to read rectangular data. Compared to the corresponding base functions, readr functions are said to be faster and more user-friendly.
+
+Importing the library:
+
+```{r,eval=FALSE}
+library(tidyverse) # to import tidyr, dplyr, readr and gglot
+library(readr) # to import readr only
+```
+
+```{text}
+read_delim(file, delim, quote = "\"", escape_backslash = FALSE,
+escape_double = TRUE, col_names = TRUE, col_types = NULL,
+locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+comment = "", trim_ws = FALSE, skip = 0, n_max = Inf,
+guess_max = min(1000, n_max), progress = show_progress(),
+skip_empty_rows = TRUE)
+
+read_csv(file, col_names = TRUE, col_types = NULL,
+locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+quote = "\"", comment = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+guess_max = min(1000, n_max), progress = show_progress(),
+skip_empty_rows = TRUE)
+
+read_csv2(file, col_names = TRUE, col_types = NULL,
+locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+quote = "\"", comment = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+guess_max = min(1000, n_max), progress = show_progress(),
+skip_empty_rows = TRUE)
+
+read_tsv(file, col_names = TRUE, col_types = NULL,
+locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+quote = "\"", comment = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+guess_max = min(1000, n_max), progress = show_progress(),
+skip_empty_rows = TRUE)
+
+Args:
+    file <- character/vector of character.
+         Either a path to a file, a connection, or literal data
+        (either a single string or a raw vector).
+        Files ending in .gz, .bz2, .xz, or .zip will be automatically
+        uncompressed. Files starting with http://, https://, ftp://,
+        or ftps:// will be automatically downloaded. Remote gz files
+        can also be automatically downloaded and decompressed.
+    delim <- referr2 read.table
+    quote <- referr2 read.table
+    escape_backslash <- referr2 read.table
+    escape_double <- referr2 read.table
+    col_names <- logical/vector of character. Read/customize headers.
+    col_types <- NULL/cols()/character. Omitted.
+    locale <- Omitted.
+    na <- vector of character. Strings for NA.
+    quoted_na <- logical. Should missing values inside quotes be treated
+        as missing values (the default) or strings.
+    comment <- referr2 read.table
+    trim_ws <- logical. Should leading and trailing whitespace be trimmed
+        from each field before parsing it?
+    skip <- integral. Number of lines to skip before reading data.
+    n_max <- integral. Maximun number of lines to read.
+    progress <- logical. Show progressbar?
+    skip_empty_rows <- logical. Ignore blank lines?
+```
+
+
+# Describing data
+
+## Getting the first/last n rows and header by `head()`/`tail()`
+
+```{text}
+head(x,n=6)
+
+Args:
+    x <- dataframe.
+    n <- integral <= dim(x).
+
+tail(x) referr2 `head()`.
+```
+
+```{r}
+rm(list = ls())
+head(mpg)
+head(mpg, n = 3)
+tail(mpg)
+tail(mpg, n = 3)
+```
+
+## Getting the last n rows and header by `tail()`
+
+
+
+## Getting length and width of an object by `length()` \& `dim()` \& `nrow()` \& `ncol()`
+
+```{r}
+rm(list = ls())
+b <- c(1:5)
+length(b) # How long a vector is.
+dim(b)
+nrow(b)
+ncol(b)
+b <- data.frame(x1 = 1:5, x2 = 6:10)
+length(b) # How wide (column number) a dataframe is.
+length(b$x1) # How long (row number) a dataframe is.
+dim(b) # Length (row number), width (column number)
+nrow(b)
+ncol(b)
+rm(b)
+```
+
+## Select data by `which()` \& `which.*()`
+
+```{text}
+which(x)
+
+Give the indices of TRUE within a vector of logicals.
+
+Args:
+    x <- vector of logicals.
+
+Return/Accept: vector of integrals <- which
+
+which.max(x)
+
+Give the indix of the first maximun value within a vector of numerals.
+
+Args:
+    x <- vector of numerals.
+
+Return/Accept: vector of integrals <- which.max
+
+which.min referr2 which.max
+
+```
+
+```{r}
+rm(list = ls())
+b <- mpg$hwy >= 24
+head(b) # Cars with highway miles per gallon >=24
+c <- which(b)
+c
+mpg[c,]
+# equals to
+mpg[which(mpg$hwy >= 24),]
+# or
+mpg[mpg$hwy >= 24,]
+which.max(c(1:5))
+which.min(c(1:5))
+```
+
+## Get mean/sd/quarters of each column by `summary()`
+
+```{text}
+summary(x)
+
+Args:
+    x <- R objects.
+
+Return/Accept: summaryDefault <- summary
+```
+
+```{r}
+rm(list = ls())
+summary(c(1:5))
+summary(mpg)
+```
+
+## Get statistics of vector by `mean()` \& `meian()` \& `sd()` \& `sum()`
+
+```{text}
+mean(x)
+
+Args:
+    x <- numeric/logical vectors.
+
+Return/Accept: numeric <- mean
+
+median & sd & sum referr2 mean
+```
+
+Have to use numeric/logical vectors, otherwise `NA` will be returned. Omitted.
+
+## Get structure of R objects by `str()`
+
+```{text}
+str(x)
+
+Args:
+    x <- R object.
+
+Return/Accept: NULL <- str
+```
+
+```{r}
+rm(list = ls())
+b <- c(1:5)
+str(b)
+b <- data.frame(x1 = 1:5, x2 = 6:10)
+str(b)
+str(mpg)
+```
+
+## Get the data type of object by `class()`
+
+```{text}
+class(x)
+
+Args:
+    x <- R object.
+
+Return/Accept: character <- class
+```
+
+```{r}
+rm(list = ls())
+class(c(1:5))
+class(matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3))
+class(data.frame(x1 = 1:5, x2 = 6:10))
+```
+
+## Get/Set object attribute lists by `attributes()`
+
+```{text}
+attributes(x)
+
+Args:
+    x <- R object.
+
+Return/Accept: list <- attributes
+```
+
+```{r}
+rm(list = ls())
+date1 <- as.POSIXct("2020-01-07", tz = "GMT")
+attributes(date1)
+date1
+attributes(date1)$tzone <- "America/New_York"
+attributes(date1)
+date1
+```
+
+## Determine/Eliminate the existence of NA by `anyNA()` \& `complete.cases()` \& `na.omit()` \& `tidyr::drop_na()`
+
+```{text}
+anyNA(x)
+
+anyNA shows whether there is NA inside.
+
+Args:
+    x <- R object.
+
+Return/Accept: logical <- anyNA
+
+complete.cases(x)
+
+complete.cases shows whether there is NA inside each column (case).
+
+Args:
+    x <- R object.
+
+Return/Accept: vector of logical <- complete.cases
+```
+
+```{r}
+rm(list = ls())
+a <- data.frame(x1 = c(1, 2, 3, NA, 5), x2 = 6:10)
+anna <- data.frame(x1 = c(1:5), x2 = 6:10)
+m <- matrix(data = c(9, 2, NA, 4, 5, 6), ncol = 3)
+mnna <- matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3)
+anyNA(c(1:5))
+anyNA(c(1, 2, NA, 4, 5))
+anyNA(mnna)
+anyNA(m)
+anyNA(anna)
+anyNA(a)
+complete.cases(c(1:5))
+complete.cases(c(1, 2, NA, 4, 5))
+complete.cases(mnna)
+complete.cases(m)
+complete.cases(anna)
+complete.cases(a)
+a[complete.cases(a),]
+na.omit(a)
+na.exclude(a) # ???
+tidyr::drop_na(a)
+```
+
+## Determine/Eliminate the existence of dulicates by `duplicated()` and `unique()`
+
+```{text}
+duplicated(x)
+
+Will return duplicated indecies.
+
+Args:
+    x <- vector/dataframe.
+
+Return/Accept: vector of logicals <- duplicated
+```
+
+```{r}
+rm(list = ls())
+head(duplicated(mpg))
+which(duplicated(mpg))
+dim(mpg)
+dedup <- mpg[which(!duplicated(mpg)),] # SLOW!
+dim(dedup)
+```
+
+```{text}
+unique(x)
+
+Will return vector/dataframe without duplicates.
+
+Args:
+    x <- vector/dataframe.
+
+Return/Accept: vector/dataframe <- unique
+```
+
+```{r}
+rm(list = ls())
+dim(mpg)
+dedup <- unique(mpg)
+dim(dedup)
+```
+
+# Generating new data from existing data \& *de novo*
+
+## Random sampling by `sample()`
+
+```{text}
+sample(x, size, replace = FALSE, prob = NULL)
+
+Args:
+    x <- vector/dataframe.
+    size <- integral. How many?
+    replace <- logical. Allow duplicates?
+    prob <- vector of numerals with the sum 1.
+        probabilities/weights of each element in x.
+```
+
+```{r}
+rm(list = ls())
+a <- c(1:5)
+sample(a, 1)
+sample(a, 10, replace = TRUE)
+sample(a, 10, replace = TRUE, prob = c(0.1, 0.2, 0.3, 0.4, 0.0))
+mpg[sample(seq_along(mpg$hwy), 5),]
+# seq_along is a safer version of c(1:...)
+```
+
+## *de novo* generation of data by `rnorm()`
+
+```{text}
+rnorm(n, mean = 0, sd = 1)
+
+Args:
+    n <- integral. How many?
+    mean <- numeral. Mean?
+    sd <- numeral. Standard deviation?
+
+Accept/Return: vector of integrals <- rnorm
+```
+
+```{r}
+rm(list = ls())
+a <- rnorm(2000, mean = 100, sd = 7)
+head(a)
+hist(a)
+```
+
+Other functions for normal distributions:
+
+Use `pnorm(val)` to calculate the Cumulative Distribution Function valur fot `val`.
+
+Use `qnorm(val)` as an inverse operation.
+
+e.g.
+
+
+
+```{r}
+rm(list = ls())
+a <- data.frame(x = c(), y = c())
+for (i in seq(-10, 10, 0.1)) { a <- rbind(a, c(i, pnorm(i))) }
+plot(a, type = "l", xlab = "X", ylab = "CDF(X)", main = "Cumulative Distribution Function for Normal Distributions")
+```
+
+# Data cleaning by `tidyverse`: `tidyr` \& `dplyr`
+
+
+
+## Pipes in R: `%>%`
+
+Rather than forcing the user to either save intermediate objects or nest functions, dplyr provides the %>% operator from magrittr. `x %>% f(y)` turns into `f(x, y)` so the result from one step is then “piped” into the next step.
+
+## Create tidy data by `tidyr`
+`tidyr` provides tools to help to create tidy data, where each column is a variable, each row is an observation, and each cell contains a single value. `tidyr` contains tools for changing the shape (pivoting) and hierarchy (nesting and 'unnesting') of a dataset, turning deeply nested lists into rectangular data frames ('rectangling'), and extracting values out of string columns. It also includes tools for working with missing values (both implicit and explicit).
+
+### Wide to long: `gather()`
+```{text}
+gather(data, key = "key", value = "value", ...,
+na.rm = FALSE, convert = FALSE, factor_key = FALSE)
+
+Args:
+    data <- dataframe.
+    key, value <- character. Names of new key and value columns.
+    ... referr2 dplyr::select()
+    na.rm <- logical. Remove NA.
+    factor_key <- logical. If FALSE, the default, the key values will be stored as a
+        character vector. If TRUE, will be stored as a factor, which preserves the original
+        ordering of the columns.
+```
+
+```{r}
+rm(list = ls())
+stocks <- data.frame(
+  time = as.Date('2009-01-01') + 0:9,
+  X = rnorm(10, 0, 1),
+  Y = rnorm(10, 0, 2),
+  Z = rnorm(10, 0, 4)
+)
+head(stocks,n=3)
+stocksm <- stocks %>% gather("stock", "price", -time)
+head(stocksm,n=3)
+```
+
+### Long to wide: `spread()`
+
+```{text}
+spread(data, key, value, fill = NA)
+
+Args:
+    data <- reffer2 gather()
+    key <- reffer2 gather()
+    value <- reffer2 gather()
+    fill <- If set, missing values will be replaced with this value.
+```
+
+```{r}
+stocksm %>% spread("stock", "price")
+stocksm %>% spread("time", "price")
+```
+
+### `drop_na()`: referr2 NA removal
+
+### TODO: `separate()` \& `extract()` \& `unite()`
+
+## Manipulating rectangular data by `dplyr`
+
+Please be aware that `dplyr` do not cooperate very will with NAs. Have them removed!
+
+### Filtering data with certain rules by `dplyr::filter()`
+
+`filter()` allows you to select a subset of rows in a data frame. Like all single verbs, the first argument is the tibble (or data frame). The second and subsequent arguments refer to variables within that data frame, selecting rows where the expression is TRUE.
+
+You have to use `dplyr::filter` due to the conflicts. We'll use `mpg` dataset from `ggplot2`
+
+```{r}
+rm(list = ls())
+dim(mpg)
+dim(dplyr::filter(mpg))
+# Will get a dataframe same as mpg
+dim(dplyr::filter(mpg, hwy >= 24))
+# Which is equal to:
+dim(mpg[mpg$hwy >= 24,])
+# or:
+dim(mpg %>% dplyr::filter(hwy >= 24))
+```
+
+### select rows by `slice()`
+
+```{r}
+slice(mpg, 1:3)
+# Which is equal to:
+mpg[1:3,]
+slice_head(mpg, n = 3)
+# Which is equal to:
+head(mpg, n = 3)
+# There is also slice_tail()
+slice_sample(mpg, n = 3)
+# Which is equal to:
+mpg[sample(c(1:dim(mpg)[1]), 3),]
+# slice_max(data, which column, n=?)
+slice_max(mpg, hwy, n = 3)
+# There is also slice_min()
+```
+
+### Select columns by `select()`
+
+```{r}
+head(select(mpg, cty, hwy), n = 3)
+# Use : to select range of columns
+head(select(mpg, trans:hwy), n = 3)
+# Use ! to exclude columns
+head(select(mpg, !(trans:hwy)), n = 3)
+# Use other helpers
+## Use everything() to select all columns
+head(select(mpg, everything()), n = 3)
+## Use last_col(offset) to select the last `offset` column
+head(select(mpg, last_col(offset = 1)), n = 3)
+## Start with & End with & Contains
+head(select(mpg, starts_with("m")), n = 3)
+head(select(mpg, ends_with("y")), n = 3)
+head(select(mpg, contains("y")), n = 3)
+```
+
+### Sort the records by `arrange()`
+
+To sort the dataset by the column provded by arguments.
+
+```{r}
+mpg1 <- slice_sample(mpg, n = 20)
+mpg1
+arrange(mpg1, year, hwy)
+# In reversed order:
+arrange(mpg1, desc(year), hwy)
+# Which is equal to:
+mpg1[order(-mpg1$year, mpg1$hwy),]
+```
+
+### Add new columns with `mutate()` \& `transmute()`
+
+This function generates a new column based on old columns.
+
+```{r}
+head(mutate(mpg1, diff = hwy - cty), n = 3)
+# Which is equal to:
+head(transform(mpg1, diff = hwy - cty), n = 3)
+# Use transmute() to keep mutated values only.
+head(transmute(mpg1, diff = hwy - cty), n = 3)
+```
+
+### Remane columns with `rename()`
+
+```{r}
+head(rename(mpg, make = manufacturer, mod = model), n = 3)
+# Change the values when select by `select()`
+head(select(mpg, make = manufacturer, mod = model), n = 3)
+```
+
+### Change column order with `relocate()`
+
+Use a similar syntax as `select()` to move blocks of columns at once.
+
+```{r}
+head(relocate(mpg, year:fl, .before = model), n = 3)
+# You may also use `.after`
+```
+
+### Summarise values with `summarise()` FAILED
+
+# Plotting by `ggplot2` \& `viridis` \& basic plotting functions
+
+## Plotting Devices
+
+In this example, we will use `plot(a)` as our plot, which should be:
+
+```{r, eval = FALSE}
+rm(list = ls())
+a <- rnorm(5, mean = 100, sd = 7)
+plot(a)
+```
+
+```{text}
+bmp(filename = "Rplot%03d.bmp", width = 480, height = 480,
+units = "px", pointsize = 12, bg = "white", res = NA, family = "")
+
+jpeg(filename = "Rplot%03d.jpg", width = 480, height = 480,
+units = "px", pointsize = 12, quality = 75, bg = "white", res = NA, family = "")
+
+png(filename = "Rplot%03d.png", width = 480, height = 480,
+units = "px", pointsize = 12, bg = "white", res = NA, family = "")
+
+tiff(filename = "Rplot%03d.tif", width = 480, height = 480,
+units = "px", pointsize = 12, bg = "white", res = NA, family = "")
+
+Args:
+    filename <- character. Output filename.
+    width <- numeric. Width of the device.
+    height <- numeric. Height of the device.
+    units <- character. Units of height and width.
+        Avail: px (Default), in, cm, mm
+    pointsize <- integral. Point size.
+    bg <- character. Background color.
+    res <- integral. Resolution (Default=72).
+    family <- character. Font family.
+
+pdf(file = if(onefile) "Rplots.pdf" else "Rplot%03d.pdf",
+width = 7, height = 7, onefile = TRUE, family = "Helvetica",
+title = "R Graphics Output", version = "1.4", paper = "special",
+encoding, bg = "transparent", fg = "black", pointsize = 12)
+
+postscript(file = if(onefile) "Rplots.ps" else "Rplot%03d.ps",
+onefile = TRUE, family = "Helvetica", width = 0, height = 0,
+title = "R Graphics Output", horizontal = TRUE, pointsize = 12,
+ paper = "special", pagecentre = TRUE)
+
+svg(filename = if(onefile) "Rplots.svg" else "Rplot%03d.svg",
+width = 7, height = 7, pointsize = 12, onefile = FALSE,
+family = "sans", bg = "white")
+
+Args:
+    file <- referr2 png
+    width <- referr2 png
+    height <- referr2 png
+    onefile <- logic. Use one file for all outputs.
+    family <- referr2 png
+    title <- character. Title of the picture.
+    version <- character. PDF version.
+    paper <- character. Paper size.
+        Avail: "a4", "letter" (or "us"), "legal", "executive"
+    horizontal <- logical. the orientation of the printed image.
+    pointsize <- referr2 png
+    bg <- referr2 png
+    Fg <- character. Foreground color.
+    pagecentre <- logical. Where to put the picture.
+```
+
+```{r, eval = FALSE}
+png(filename = "demo.png", bg = "white")
+plot(a)
+dev.off()
+jpeg(filename = "demo.jpg")
+plot(a)
+dev.off()
+bmp(filename = "demo.bmp")
+plot(a)
+dev.off()
+tiff(filename = "demo.tiff")
+plot(a)
+dev.off()
+postscript(file = "demo.ps")
+plot(a)
+dev.off()
+pdf(file = "demo.pdf")
+plot(a)
+dev.off()
+svg(filename = "demo.svg")
+plot(a)
+dev.off()
+```
+
+## Plotting functions in `base`
+
+### Histogram: `hist()`
+
+```{text}
+hist(x, col = "lightgray", main = paste("Histogram of" , xname),
+xlim = range(breaks), ylim = NULL, xlab = xname, ylab)
+
+Args:
+    x <- vector of numerals. What to plot.
+    col <- character. Color used.
+    main <- character. Title.
+    xlim <- range. Range of X axis.
+    ylim <- range. Range of Y axis.
+    xlab <- character. X axis lables.
+    ylab <- character. Y axis lables.
+```
+
+```{r}
+rm(list = ls())
+hist(mpg$hwy, col = "red", xlab = "highway miles per gallon", ylab = "Frequency of highway miles per gallon")
+```
+
+### Boxplot: `boxplot()`
+
+```{text}
+boxplot(x..., range = 1.5, width = NULL, varwidth = FALSE,
+notch = FALSE, outline = TRUE, \border = par("fg"),
+col = "lightgray", horizontal = FALSE, names)
+
+Args:
+    x... <- referr2 hist
+    width <- vector of numerals. Width of boxes.
+    varwidth <- logical. The boxes are drawn with widths proportional to
+        the square-roots of the number of observations in the groups.
+    notch <- logical. Draw notches.
+    outline <- logical. Draw outlines.
+    col <- referr2 hist
+    horizontal <- logical. Change direction.
+    names <- vector of characters. Change the name of x-axis.
+```
+
+```{r}
+rm(list = ls())
+boxplot(mpg$cty, mpg$hwy, col = c("red", "green"),
+		names = c("city miles per gallon", "highway miles per gallon"))
+boxplot(mpg$cty, mpg$hwy, notch = TRUE, horizontal = TRUE)
+```
+
+### Scatter plot \& line plot: `plot()`
+
+```{text}
+plot(x, y, type = "p")
+
+Args:
+    x <- vector. the coordinates of points in the plot.
+    y <- vector. the y coordinates of points in the plot, optional if x is an
+        appropriate structure.
+    type <- character. what type of plot should be drawn.
+        Avail:
+            "p" for points,
+            "l" for lines,
+            "b" for both,
+            "c" for the lines part alone of "b",
+            "o" for both ‘overplotted’,
+            "h" for ‘histogram’ like (or ‘high-density’) vertical lines,
+            "s" for stair steps,
+            "S" for other steps, see ‘Details’ below,
+            "n" for no plotting.
+    main <- character. an overall title for the plot.
+    sub <- character. a sub title for the plot.
+    xlab <- character. a title for the x axis.
+    ylab <- character. a title for the y axis.
+```
+
+```{r}
+plot(c(1:5),c(11:15),type="b")
+```
+
+## TODO: Advanced plotting by `ggplot2`
+
+### Graphics can be saved by `ggsave()`.
+
+```{text}
+ggsave(filename, plot = last_plot(), device = NULL,
+path = getwd(), scale = 1, width = NA, height = NA,
+units = c("in", "cm", "mm"), dpi = 300,...)
+
+Args:
+    filename <- referr2 png
+    plot <- ggplot. The plot you want to save.
+    device <- device used.
+        Avail: "eps", "ps", "tex" (pictex),
+            "pdf", "jpeg", "tiff", "png", "bmp", "svg",  "wmf"
+    path <- The directory your picture will in.
+    scale <- numeric. Multiplicative scaling factor.
+    width <- referr2 png
+    height <- referr2 png
+    units <- referr2 png
+    ... <- arguments passed to graphical devices.
+```
+
+
+# String modification by stringr \& basic string functions
+
+## Getting substrings by `str_sub()`
+
+```{text}
+str_sub(string, start = 1L, end = -1L)
+
+Args:
+    string <- character. input character vector.
+    start, end <- Two integer vectors. start gives the position of the
+        first character (defaults to first), end gives the position of
+        the last (defaults to last character). Alternatively, pass a
+        two-column matrix to start.
+        Negative values count backwards from the last character.
+```
+
+```{r}
+hw <- c("Hadley Wickham")
+str_sub(hw, 1, 6)
+str_sub(hw, end = 6)
+str_sub(hw, 8, 14)
+str_sub(hw, start = 8)
+str_sub(hw, c(1, 8), c(6, 14))
+hw <- c("Hadley Wickham", "Ammonium Bicarbonate")
+str_sub(hw, 1, 6)
+str_sub(hw, end = 6)
+str_sub(hw, 8, 14)
+str_sub(hw, start = 8)
+str_sub(hw, c(1, 8), c(6, 14))
+```
+
+## Replace with regex by `str_replace()` \& `str_replace_all()` \& `gsub()`
+
+```{text}
+str_replace(string, pattern, replacement)
+str_replace_all(string, pattern, replacement)
+
+Args:
+    string <- referr2 str_sub()
+    pattern <- character. Regex pattern to look for.
+    replacement <- character. A character vector of replacements.
+        Should be either length one, or the same length as string or pattern.
+        References of the form \1, \2, etc will be replaced with the contents
+        of the respective matched group (created by ()).
+```
+
+```{r}
+fruits <- c("one apple", "two pears", "three bananas")
+str_replace(fruits, "([aeiou])", "\\1\\1")
+str_replace(fruits, "[aeiou]", c("1", "2", "3"))
+```
+
+str_split
+
+```{text}
+str_split(string, pattern, n = Inf, simplify = FALSE)
+
+Args:
+    string <- referr2 str_sub()
+    pattern <- referr2 str_sub()
+    n <- integral. number of pieces to return. Default (Inf) uses all possible
+        split positions.
+    simplify <- logical. If FALSE, the default, returns a list of character vectors.
+        If TRUE returns a character matrix.
+```
+
+```{r}
+fruits <- c(
+  "apples and oranges and pears and bananas",
+  "pineapples and mangos and guavas"
+)
+
+str_split(fruits, " and ")
+str_split(fruits, " and ", simplify = TRUE)
+```
+
+## Join strings together by `paste()` or `paste0()`
+
+```{text}
+paste (..., sep=" ")
+paste0(...) <- paste(..., sep="")
+
+Args:
+    ... <- R objects. To be converted to character vectors.
+    sep <- a character. To separate the terms. Not NA_character_.
+```
