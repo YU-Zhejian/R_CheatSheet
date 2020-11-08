@@ -52,6 +52,20 @@ library(tidyverse)
 data("mpg")
 ```
 
+# Interesting things in R
+
+## Replicate a function by `replicate()`
+
+```{r,eval=FALSE}
+rm(list = ls())
+c1<-replicate(10,mean(sample(rnorm(100, 0, 100)),20))
+# Equals to:
+c1<-c()
+for (i in c(1:10)){
+c1[i] <- mean(sample(rnorm(100, 0, 100)),20)
+}
+```
+
 # R Data Types
 
 ## Vector
@@ -85,6 +99,13 @@ c # Link those vectors together.
 a <- data.frame(1:5, 6:10)
 c <- c(a, b)
 c # This gives a list.
+```
+
+### Determine whether an item is inside a vector by `%in%`
+
+```{r}
+1%in%c(1,2,3)
+c(1,2)%in%c(1,2,3)
 ```
 
 ## Matrices
@@ -795,7 +816,9 @@ mpg[sample(seq_along(mpg$hwy), 5),]
 # seq_along is a safer version of c(1:...)
 ```
 
-## *de novo* generation of data by `rnorm()`
+## *de novo* generation of data by
+
+### Normal distribution by `rnorm()`
 
 ```{text}
 rnorm(n, mean = 0, sd = 1)
@@ -811,7 +834,6 @@ Accept/Return: vector of integrals <- rnorm
 ```{r}
 rm(list = ls())
 a <- rnorm(2000, mean = 100, sd = 7)
-head(a)
 hist(a)
 ```
 
@@ -823,13 +845,35 @@ Use `qnorm(val)` as an inverse operation.
 
 e.g.
 
-
-
 ```{r}
 rm(list = ls())
 a <- data.frame(x = c(), y = c())
 for (i in seq(-10, 10, 0.1)) { a <- rbind(a, c(i, pnorm(i))) }
 plot(a, type = "l", xlab = "X", ylab = "CDF(X)", main = "Cumulative Distribution Function for Normal Distributions")
+```
+
+### Exponential Distribution by `rexp()`
+
+```{text}
+rexp(n, rate = 1)
+
+Args:
+    n <- referr2 rnorm
+    rate <- numeral.
+```
+
+```{r}
+a <- rexp(2000, rate=2)
+hist(a)
+```
+
+### Uniform Distribution by `runif()`
+
+Please note that it should be regarded as "r unif" instead of "run if".
+
+```{r}
+a <- runif(2000,min=0,max=100)
+hist(a)
 ```
 
 # Data cleaning by `tidyverse`: `tidyr` \& `dplyr`
