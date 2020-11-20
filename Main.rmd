@@ -40,6 +40,55 @@ seq(1, 10, by = 2)
 
 Now, click the **Run** button on the chunk toolbar to [execute](https://www.jetbrains.com/help/pycharm/r-markdown.html#run-r-code) the chunk code. The result should be placed under the chunk. Click the **Knit and Open Document** to built and preview an output.
 
+## Meet R for PyCharm
+R for PyCharm supports statistical computing using [R 3.4 and later](https://cran.r-project.org/mirrors.html). With the IDE you can use coding assistance, visual debugging, smart running, preview tools, and other productivity features.
+The plugin adds the following tool windows to the user interface:
+
+* [R Console](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-console)
+* [R Tools window](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-packages)
+
+### Create a file
+The following types are available:
+* [R file](https://www.jetbrains.com/help/pycharm/edit-r-files.html#add-file) - an R file with executable code chunks
+* [R Markdown document](https://www.jetbrains.com/help/pycharm/r-markdown.html) - a basic Markdown document
+* [R Markdown presentation](https://www.jetbrains.com/help/pycharm/r-markdown.html#presentation) - a markdown file that can be built into a presentation and previewed in a browser
+* [HTML notebook](https://www.jetbrains.com/help/pycharm/r-markdown.html#html-output) - a notebook that can be converted into an HTML output file
+* [Shiny](https://www.jetbrains.com/help/pycharm/r-markdown.html#shiny) - an interactive Shiny widget
+
+### Run R code
+
+* [Execute R commands](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-console) in the R Console
+* [Run R script](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#run) in the editor
+* [View variables](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#variables)
+* [View graphics](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-graphics)
+* [View tables](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#table-view)
+* [Manage jobs](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#jobs)
+
+### Got any issues?
+* [Debug R code](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#debug)
+
+### Build visual R markdown
+
+The plugin supports different markdown content: documents, notebooks, presentations, and Shiny (interactive markdown).
+
+* [Create presentation](https://www.jetbrains.com/help/pycharm/r-markdown.html#presentation)
+* [Add interactive widgets](https://www.jetbrains.com/help/pycharm/r-markdown.html#shiny)
+
+### Create your package
+* [Create and build R packages](https://www.jetbrains.com/help/pycharm/r-packages.html)
+
+### Tune your environment
+* [Configure code and inspections](https://www.jetbrains.com/help/pycharm/edit-r-files.html)
+* [Create templates](https://www.jetbrains.com/help/pycharm/setup-r-environment.html#r-templates)
+
+### Keep your project under version control
+* [Manage files under version control](https://www.jetbrains.com/help/pycharm/adding-files-to-version-control.html)
+* [Review changes](https://www.jetbrains.com/help/pycharm/viewing-changes-information.html)
+* [Resolve conflicts](https://www.jetbrains.com/help/pycharm/resolving-conflicts.html)
+
+### More questions?
+Refer to [R plugin web help](https://www.jetbrains.com/help/pycharm/r-plugin-support.html)
+
 ## Another piece of advertisement
 
 `awk` is the best statistical language in the word.
@@ -790,6 +839,20 @@ dim(dedup)
 
 # Generating new data from existing data \& *de novo*
 
+## Import embedded datasets by `data()`
+
+Function `data()` can import those datasets embedded in packages, or listing all available datasets if no arguments provided.
+
+```{r}
+data(mpg)
+# datasets in ggplot2
+head(data(package = "ggplot2")$results,n=3)
+# datasets available now
+head(data()$results,n=3)
+#data(package = .packages(all.available = TRUE))
+#list the data sets in all *available* packages.
+```
+
 ## Random sampling by `sample()`
 
 ```{text}
@@ -816,6 +879,8 @@ mpg[sample(seq_along(mpg$hwy), 5),]
 ## *de novo* generation of data by
 
 ### Normal distribution by `rnorm()`
+
+Normal Distribution is a bell-shaped frequency distribution curve which helps describe all the possible values a random variable can take within a given range with most of the distribution area is in the middle and few are in the tails, at the extremes.
 
 ```{text}
 rnorm(n, mean = 0, sd = 1)
@@ -846,6 +911,7 @@ Use `dnorm(val)` to get the Probability Density Function value for `val` in a di
 e.g.
 
 ```{r}
+x<-seq(-10, 10, 0.1)
 a<- data.frame(x = x, y=pnorm(x))
 ggplot(a, aes(x = x)) +
   geom_line(aes(y = y)) +
@@ -867,6 +933,7 @@ Args:
 ```
 
 ```{r}
+x<-seq(-2, 5, 0.05)
 a <- rexp(2000, rate=2)
 gghistogram(a)
 a<- data.frame(x = x, y=pexp(x))
@@ -884,6 +951,7 @@ ggplot(a, aes(x = x)) +
 Please note that it should be regarded as "r unif" instead of "run if".
 
 ```{r}
+x<-seq(-10, 10, 0.1)
 a <- runif(2000, min = 0, max = 100)
 gghistogram(a)
 a<- data.frame(x = x, y=punif(x))
@@ -898,7 +966,12 @@ ggplot(a, aes(x = x)) +
 
 ### Student's T Distribution by `rt()`
 
+A statistical distribution published by William Gosset in 1908. His employer, Guinness Breweries, required him to publish under a pseudonym, so he chose "Student". Given $N$ independent measurements $x_{i}$, let let
+$$t=\frac{\bar{x}-\mu}{s/\sqrt{N}},$$
+where $\mu$ is the population mean, $\bar{x}$ is the sample mean, and $s$ is the estimator for population standard deviation.
+
 ```{r}
+x<-seq(-10, 10, 0.1)
 a <- rt(2000, df = 2)
 gghistogram(a)
 # Dots = normal distribution
@@ -919,6 +992,46 @@ ggplot(a, aes(x = x)) +
   labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Student's T Distribution")
 ```
 
+### F distribution by `rf()`
+
+If U and V are independent chi-square random variables with $r_{1}$ and $r_{2}$ degrees of freedom, respectively, then:
+$$F=\frac{U/r_{1}}{V/r_{2}}$$
+follows an F-distribution with $r_{1}$ numerator degrees of freedom and $r_{2}$ denominator degrees of freedom. We write $F ~ F(r_{1},r_{2})$.
+
+```{r}
+x<-seq(-2, 5, 0.05)
+# Dots = normal distribution
+# black, red, green: df = 1, 2, 3
+a<- data.frame(x = x, y1 = pf(x, 1,81), y2 = pf(x, 81,1), y3=pf(x, 1,1), y4 = pf(x, 81,81))
+ggplot(a, aes(x = x)) +
+  geom_line(aes(y = y1)) +
+  geom_line(aes(y = y2), color = "red") +
+  geom_line(aes(y = y3), color = "blue") +
+  geom_point(aes(y = y4)) +
+  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
+a<- data.frame(x = x, y1 = df(x, 1,81), y2 = df(x, 81,1), y3=df(x, 1,1), y4 = df(x, 81,81))
+ggplot(a, aes(x = x)) +
+  geom_line(aes(y = y1)) +
+  geom_line(aes(y = y2), color = "red") +
+  geom_line(aes(y = y3), color = "blue") +
+  geom_point(aes(y = y4)) +
+  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
+a<- data.frame(x = x, y1 = pf(x, Inf,1), y2 = pf(x, 1,Inf), y3 = pf(x, 1,1), y4 = pf(x, Inf,Inf))
+ggplot(a, aes(x = x)) +
+  geom_line(aes(y = y1)) +
+  geom_line(aes(y = y2), color = "red") +
+  geom_line(aes(y = y3), color = "blue") +
+  geom_point(aes(y = y4)) +
+  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
+a<- data.frame(x = x, y1 = df(x, Inf,1), y2 = df(x, 1,Inf), y3 = df(x, 1,1), y4 = df(x, Inf,Inf))
+ggplot(a, aes(x = x)) +
+  geom_line(aes(y = y1)) +
+  geom_line(aes(y = y2), color = "red") +
+  geom_line(aes(y = y3), color = "blue") +
+  geom_point(aes(y = y4)) +
+  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
+```
+
 # Performing statistical tests
 
 ## Students' T-test by `t.test()`
@@ -927,6 +1040,8 @@ ggplot(a, aes(x = x)) +
 # Perform t-test using 2 datasets (in vector of numerals)
 t.test(x, y = NULL, alternative = c("two.sided", "less", "greater"),
 conf.level = 0.95)
+
+
 
 # Perform t-test using 1 dataset and mean (Arg: mu)
 t.test(x, mu = 0, alternative = c("two.sided", "less", "greater"),
@@ -938,11 +1053,20 @@ t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), mu = 1)
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3))
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3), alternative = "greater")
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3), alternative = "less")
+head(mpg,n=10)
+# Perform t-test using 2 columns of one dataset
+t.test(x=mpg$cty,y=mpg$hwy)
+# Perform t-test using groups
+t.test(data=mpg[1:10,],cty ~ cyl)
 ```
 
-## Wilcoxin test by `wilcox.test`
+## Wilcoxin test by `wilcox.test()`
 
-Syntax similar to `t.test`, but can be used when the sample is not that normal.
+Syntax similar to `t.test()`, but can be used when the sample is not that normal.
+
+## F test by `var.test()`
+
+Syntax similar to `t.test()`.
 
 # Data cleaning by `tidyverse`: `tidyr` \& `dplyr`
 
