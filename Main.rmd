@@ -337,7 +337,7 @@ getwd()
 
 ### Package management by commands in `base`
 
-#### Installation by `install.packages()`.
+#### Installation by `install.packages()`
 
 ```{text}
 install.packages(x, repos=getOption("repos"), method = "auto")
@@ -353,7 +353,8 @@ Return/Accept: NULL <- install.packages
 
 ```{r,eval=FALSE}
 rm(list = ls())
-a <- install.packages("viridis", repos = "https://cloud.r-project.org")
+install.packages("devtools")
+# Please referr to file devtools.log to see full output.
 ```
 
 #### Upgrade by `update.packages()`
@@ -390,9 +391,12 @@ library(tidyverse)
 ```{r,eval=FALSE}
 # Firstly we clone dplyr into our local folder `dplyr`.
 git2r::clone("https://github.com/tidyverse/dplyr/", "dplyr")
-devtools::install("dplyr") # Install dplyr
+devtools::install_local("dplyr") # Install dplyr
 # Equals to:
 devtools::install_github("tidyverse/dplyr")
+# Equals to:
+devtools::install_git("https://github.com/tidyverse/dplyr/")
+# Please referr to file dplyr.log to see full output.
 ```
 
 You may also install packages by `install_bitbucket()` & `install_github()` & `install_gitlab()` & `install_git()` & `install_svn()` & `install_url()`.
@@ -408,6 +412,7 @@ e.g. install `biomaRt` by `BioConductor`:
 ```{r,eval=FALSE}
 install.packages("BiocManager")
 BiocManager::install("biomaRt")
+# Please referr to file biomart.log to see full output.
 # Update:
 BiocManager::install(update = TRUE, ask = FALSE)
 ```
@@ -876,7 +881,7 @@ mpg[sample(seq_along(mpg$hwy), 5),]
 # seq_along is a safer version of c(1:...)
 ```
 
-## *de novo* generation of data by
+## *de novo* generation of data by  `stats`
 
 ### Normal distribution by `rnorm()`
 
@@ -921,6 +926,20 @@ ggplot(a, aes(x = x)) +
   geom_line(aes(y = y)) +
   labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Normal Distribution")
 ```
+
+Normal distributions can also be checked by *Normal Q-Q Plot* or *Shapiro-Wilk test*
+
+#### Normal Q-Q Plot Example:
+
+```{r}
+norm_sample<-sample(rnorm(1000,10,1),400)
+hist(norm_sample)
+qqnorm(norm_sample)
+
+shapiro.test(norm_sample)
+rm(norm_sample)
+```
+
 
 ### Exponential Distribution by `rexp()`
 
@@ -1032,7 +1051,7 @@ ggplot(a, aes(x = x)) +
   labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
 ```
 
-# Performing statistical tests
+# Performing statistical tests by `stats`
 
 ## Students' T-test by `t.test()`
 
@@ -1060,13 +1079,23 @@ t.test(x=mpg$cty,y=mpg$hwy)
 t.test(data=mpg[1:10,],cty ~ cyl)
 ```
 
+The power of T-test can be checked by `power.t.test()`.
+
 ## Wilcoxin test by `wilcox.test()`
 
 Syntax similar to `t.test()`, but can be used when the sample is not that normal.
 
 ## F test by `var.test()`
 
-Syntax similar to `t.test()`.
+Syntax similar to `t.test()`. It checks whether there's a difference in **VARIANCE**.
+
+## Shapiro-Wilk test by `shapiro.test()`
+
+TO test whether a dataset `x` is normally distributed.
+
+## Analysis of variance by `aov()`
+
+Omitted.
 
 # Data cleaning by `tidyverse`: `tidyr` \& `dplyr`
 
@@ -1400,6 +1429,12 @@ Args:
 plot(c(1:5),c(11:15),type="b")
 ```
 
+## Plotting functions in `stats`
+
+### Normal Q-Q plot by `qqnorm()`
+
+Omitted, see above.
+
 ## TODO: Advanced plotting by `ggplot2`
 
 ### Graphics can be saved by `ggsave()`.
@@ -1424,7 +1459,7 @@ Args:
 ```
 
 
-# String modification by stringr \& basic string functions
+# String modification by `stringr` \& basic string functions
 
 ## Getting substrings by `str_sub()`
 
@@ -1510,3 +1545,7 @@ Args:
     ... <- R objects. To be converted to character vectors.
     sep <- a character. To separate the terms. Not NA_character_.
 ```
+
+# TODO
+
+`aov`
