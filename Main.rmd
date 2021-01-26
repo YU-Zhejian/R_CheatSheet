@@ -1,20 +1,27 @@
 ---
 title: "R CheatSheet for ADS2-2020"
-author: YU Zhejian
-date: 23/10/2020
-geometry: inner=0.5in,outer=0.5in
+author: "YU Zhejian"
+date: "23/10/2020"
 output:
-  html_notebook:
-    toc: true
-    toc_depth: 5
+  word_document:
+    toc: yes
+    toc_depth: '5'
   pdf_document:
-    toc: true
-    number_sections: true
+    toc: yes
+    number_sections: yes
     toc_depth: 5
-    keep_tex: true
+    keep_tex: yes
     includes:
       in_header: headers.tex
+  html_notebook:
+    toc: yes
+    toc_depth: 5
+geometry: inner=0.5in,outer=0.5in
 ---
+
+```{r global_options}
+knitr::opts_chunk$set(cache=TRUE)
+```
 
 ![YuZJLab_BG](YuZJLab_BG.png)
 
@@ -239,6 +246,8 @@ names(a)
 names(a) <- c("l1", "l2", "l3")
 names(a)
 ```
+
+There is a similiar function named `dimname()`, which allows you to change names in different dimentions. E.g. Column or row.
 
 ### Bind dataframes by `rbind()` \& `cbind()` \& `merge`
 
@@ -802,6 +811,8 @@ na.exclude(a) # ???
 tidyr::drop_na(a)
 ```
 
+You may also use `apply(is.na(data),2,which)` to get NA rows and columns.
+
 ## Determine/Eliminate the existence of dulicates by `duplicated()` and `unique()`
 
 ```{text}
@@ -1051,6 +1062,55 @@ ggplot(a, aes(x = x)) +
   labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
 ```
 
+### Poisson Distribution by `rpois()`
+
+```{r}
+x<-seq(0, 25, 1)
+a <- rpois(2000, lambda = 10)
+gghistogram(a)
+# Dots = normal distribution
+# black, red, green: lambda = 1, 5, 15
+a<- data.frame(x = x, y1 = ppois(x, 1), y2 = ppois(x, 5), y3=ppois(x, 15), yn = pnorm(x, 0))
+ggplot(a, aes(x = x)) +
+  geom_line(aes(y = y1)) +
+  geom_line(aes(y = y2), color = "red") +
+  geom_line(aes(y = y3), color = "blue") +
+  geom_point(aes(y = yn)) +
+  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Poisson Distribution")
+a<- data.frame(x = x, y1 = dpois(x, 1), y2 = dpois(x, 5), y3=dpois(x, 15), yn = dnorm(x, 0))
+ggplot(a, aes(x = x)) +
+  geom_line(aes(y = y1)) +
+  geom_line(aes(y = y2), color = "red") +
+  geom_line(aes(y = y3), color = "blue") +
+  geom_point(aes(y = yn)) +
+  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Poisson Distribution")
+```
+
+### Chi-Square Distribution by `rchisq()`
+
+```{r}
+x<-seq(0, 25, 1)
+a <- rchisq(2000, df = 10)
+gghistogram(a)
+# Dots = normal distribution
+# black, red, green: df = 1, 5, 15
+x<-seq(0, 25, 1)
+a<- data.frame(x = x, y1 = pchisq(x, 1), y2 = pchisq(x, 5), y3=pchisq(x, 15), yn = pnorm(x, 0))
+ggplot(a, aes(x = x)) +
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = yn)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Chi-Square Distribution")
+a<- data.frame(x = x, y1 = dchisq(x, 1), y2 = dchisq(x, 5), y3=dchisq(x, 15), yn = dnorm(x, 0))
+ggplot(a, aes(x = x)) +
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = yn)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Chi-Square Distribution")
+```
+
 # Performing statistical tests by `stats`
 
 ## Students' T-test by `t.test()`
@@ -1081,7 +1141,7 @@ t.test(data=mpg[1:10,],cty ~ cyl)
 
 The power of T-test can be checked by `power.t.test()`.
 
-## Wilcoxin test by `wilcox.test()`
+## Wilcoxon rank sum test by `wilcox.test()`
 
 Syntax similar to `t.test()`, but can be used when the sample is not that normal.
 
@@ -1091,11 +1151,85 @@ Syntax similar to `t.test()`. It checks whether there's a difference in **VARIAN
 
 ## Shapiro-Wilk test by `shapiro.test()`
 
-TO test whether a dataset `x` is normally distributed.
+To test whether a dataset `x` is normally distributed.
+
+
+```{r}
+shapiro.test(c(1,1,1,1,1,1,1,1,2))
+hist(c(1,1,1,1,1,1,1,1,2))
+shapiro.test(rnorm(1000,1,2))
+hist(rnorm(1000,1,2))
+```
 
 ## Analysis of variance by `aov()`
 
 Omitted.
+
+## Categorical Data Test
+
+## `chisq.test()` for Big Datasets
+
+e. g. For a matrix like
+
+|      | C1   | C2   |
+| ---- | ---- | ---- |
+| R1   | a    | b    |
+| R2   | c    | d    |
+
+Firstly we calculate the expections.
+
+|      | C1   | C2   | Sum     |
+| ---- | ---- | ---- | ------- |
+| R1   | a    | b    | a+b     |
+| R2   | c    | d    | c+d     |
+| Sum  | a+c  | b+d  | a+b+c+d |
+
+|      | Expectations of C1      | Expectations of C2      | Sum     |
+| ---- | ----------------------- | ----------------------- | ------- |
+| R1   | a'=(a+c)(a+b)/(a+b+c+d) | b'=(b+d)(a+b)/(a+b+c+d) | a+b     |
+| R2   | c'=(a+c)(c+d)/(a+b+c+d) | d'=(b+d)(c+d)/(a+b+c+d) | c+d     |
+| Sum  | a+c                     | b+d                     | a+b+c+d |
+
+So,
+
+$$
+\chi^2=\sum(\frac{(O-E)^2}{E})=\sum_{i=\{a,b,c,d\}}\frac{(i-i')^2}{i'}
+$$
+
+And then you may find
+$$
+p=1-PDF(\chi^2)
+$$
+
+```{r}
+mat_test <- matrix(data=c(84,82,82,57,34,11),nrow=2)
+dimnames(mat_test) <- list(Group=c("A","B"),Status=c("Good","Fair","Bad"))
+mat_test
+chisq.test(mat_test)
+```
+
+## `fisher.test()` for Small Datasets
+
+e. g. For a matrix like
+
+|      | C1   | C2   |
+| ---- | ---- | ---- |
+| R1   | a    | b    |
+| R2   | c    | d    |
+
+Its p-value may be calculated as
+$$
+p=\frac{(a+b)!(c+d)!(a+c)!(b+d)!}{a!b!c!d!(a+b+c+d)!}
+$$
+It can also be applied to bigger datasets.
+$$
+p=\frac{\prod(\sum \text{of each column \& row})}{\prod \text{of each cell and its sum}}
+$$
+Syntax similar to `chisq.test()`, but can be used when the sample size is small.
+
+```{r}
+fisher.test(mat_test)
+```
 
 # Data cleaning by `tidyverse`: `tidyr` \& `dplyr`
 
@@ -1427,6 +1561,16 @@ Args:
 
 ```{r}
 plot(c(1:5),c(11:15),type="b")
+```
+
+## Mosaic Plot by `mosaicplot`
+
+e.g.
+
+```{r}
+mat_test <- matrix(data=c(84,82,82,57,34,11),nrow=2)
+dimnames(mat_test) <- list(Group=c("A","B"),Status=c("Good","Fair","Bad"))
+mosaicplot(mat_test)
 ```
 
 ## Plotting functions in `stats`
