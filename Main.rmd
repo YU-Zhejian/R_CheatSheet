@@ -1,5 +1,5 @@
 ---
-title: "R CheatSheet for ADS2-2020"
+title: "R CheatSheet for ADS2 2020-21"
 author: "YU Zhejian"
 date: "23/10/2020"
 output:
@@ -11,6 +11,7 @@ output:
     number_sections: yes
     toc_depth: 5
     keep_tex: yes
+    extra_dependencies: ["times"]
     includes:
       in_header: headers.tex
   html_notebook:
@@ -19,111 +20,57 @@ output:
 geometry: inner=0.5in,outer=0.5in
 ---
 
-```{r global_options}
-knitr::opts_chunk$set(cache=TRUE)
-```
-
 ![YuZJLab_BG](YuZJLab_BG.png)
-
-# Advertisements
-
-## Writing RMarkDown Using IntelliJ-based IDEs
-
-The [R plugin](https://www.jetbrains.com/help/pycharm/r-plugin-support.html) for IntelliJ-based IDEs provides handy capabilities to work with the [R Markdown](https://www.jetbrains.com/help/pycharm/r-markdown.html) files.
-To [add](https://www.jetbrains.com/help/pycharm/r-markdown.html#add-code-chunk) a new R chunk, position the caret at any line or the code chunk, then click "+".
-
-The code chunk appears:
-
-```{r, eval = FALSE}
-rm(list = ls())
-```
-
-Type any R code in the chunk, for example:
-
-```{r}
-rm(list = ls())
-seq(1, 10, by = 2)
-```
-
-Now, click the **Run** button on the chunk toolbar to [execute](https://www.jetbrains.com/help/pycharm/r-markdown.html#run-r-code) the chunk code. The result should be placed under the chunk. Click the **Knit and Open Document** to built and preview an output.
-
-## Meet R for PyCharm
-R for PyCharm supports statistical computing using [R 3.4 and later](https://cran.r-project.org/mirrors.html). With the IDE you can use coding assistance, visual debugging, smart running, preview tools, and other productivity features.
-The plugin adds the following tool windows to the user interface:
-
-* [R Console](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-console)
-* [R Tools window](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-packages)
-
-### Create a file
-The following types are available:
-* [R file](https://www.jetbrains.com/help/pycharm/edit-r-files.html#add-file) - an R file with executable code chunks
-* [R Markdown document](https://www.jetbrains.com/help/pycharm/r-markdown.html) - a basic Markdown document
-* [R Markdown presentation](https://www.jetbrains.com/help/pycharm/r-markdown.html#presentation) - a markdown file that can be built into a presentation and previewed in a browser
-* [HTML notebook](https://www.jetbrains.com/help/pycharm/r-markdown.html#html-output) - a notebook that can be converted into an HTML output file
-* [Shiny](https://www.jetbrains.com/help/pycharm/r-markdown.html#shiny) - an interactive Shiny widget
-
-### Run R code
-
-* [Execute R commands](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-console) in the R Console
-* [Run R script](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#run) in the editor
-* [View variables](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#variables)
-* [View graphics](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#r-graphics)
-* [View tables](https://www.jetbrains.com/help/pycharm/r-plugin-support.html#table-view)
-* [Manage jobs](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#jobs)
-
-### Got any issues?
-* [Debug R code](https://www.jetbrains.com/help/pycharm/run-debug-r-script.html#debug)
-
-### Build visual R markdown
-
-The plugin supports different markdown content: documents, notebooks, presentations, and Shiny (interactive markdown).
-
-* [Create presentation](https://www.jetbrains.com/help/pycharm/r-markdown.html#presentation)
-* [Add interactive widgets](https://www.jetbrains.com/help/pycharm/r-markdown.html#shiny)
-
-### Create your package
-* [Create and build R packages](https://www.jetbrains.com/help/pycharm/r-packages.html)
-
-### Tune your environment
-* [Configure code and inspections](https://www.jetbrains.com/help/pycharm/edit-r-files.html)
-* [Create templates](https://www.jetbrains.com/help/pycharm/setup-r-environment.html#r-templates)
-
-### Keep your project under version control
-* [Manage files under version control](https://www.jetbrains.com/help/pycharm/adding-files-to-version-control.html)
-* [Review changes](https://www.jetbrains.com/help/pycharm/viewing-changes-information.html)
-* [Resolve conflicts](https://www.jetbrains.com/help/pycharm/resolving-conflicts.html)
-
-### More questions?
-Refer to [R plugin web help](https://www.jetbrains.com/help/pycharm/r-plugin-support.html)
-
-## Another piece of advertisement
-
-`awk` is the best statistical language in the word.
 
 # Global Libraries
 
-```{r}
-rm(list = ls())
+Locating global libraries.
+
+```{r global libraries}
+rm(list = ls()) # Remove cached variables
+# Knitr Options
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width = 16)
+knitr::opts_chunk$set(cache = TRUE)
+sessionInfo()
+# Check for installed packages
+installed <- installed.packages()[, 1]
+for (packages in c("tidyverse", "ggubr",
+                   "knitr", "rmarkdown", "stringr",
+                   "corrplot",
+                   "factoextra","cluster")) {
+  if (!packages %in% installed) {
+    simpleError(paste0("Package ", packages, " not installed."))
+  }
+}
+# Source global packages
 library(tidyverse)
 library(ggpubr)
+library(corrplot)
+# Source global data
 data("mpg")
+data("women")
+data("USArrests")
 ```
 
 # Interesting things in R
 
+TODO: Add parallel
+
 ## Replicate a function by `replicate()`
 
-```{r,eval=FALSE}
+```{r}
 rm(list = ls())
-c1<-replicate(10,mean(sample(rnorm(100, 0, 100)),20))
+c1 <- replicate(10, mean(sample(rnorm(100, 0, 100)), 20))
 # Equals to:
-c1<-c()
-for (i in c(1:10)){
-c1[i] <- mean(sample(rnorm(100, 0, 100)),20)
+c1 <- c()
+for (i in c(1:10)) {
+  c1[i] <- mean(sample(rnorm(100, 0, 100)), 20)
 }
 ```
 
-# R Data Types
+# Basic R Data Types
 
 ## Vector
 
@@ -161,8 +108,8 @@ c # This gives a list.
 ### Determine whether an item is inside a vector by `%in%`
 
 ```{r}
-1%in%c(1,2,3)
-c(1,2)%in%c(1,2,3)
+1 %in% c(1, 2, 3)
+c(1, 2) %in% c(1, 2, 3)
 ```
 
 ## Matrices
@@ -261,10 +208,10 @@ c
 names(b) <- names(a)
 d <- rbind(a, b)
 d
-a <- data.frame(idx=c(1:5), x=c(6:10),ab = c(11:15))
-b <- data.frame(idx=c(1:5), y=c(16:20),ab = c(13:17))
-merge(a,b,by = "idx")
-merge(a,b,by="ab")
+a <- data.frame(idx = c(1:5), x = c(6:10), ab = c(11:15))
+b <- data.frame(idx = c(1:5), y = c(16:20), ab = c(13:17))
+merge(a, b, by = "idx")
+merge(a, b, by = "ab")
 ```
 
 ## List
@@ -303,9 +250,9 @@ a <- dice(6)
 a
 ```
 
-## Conversions between datatypes: `as.*` functions
+## Conversions between datatype: `as.*` functions
 
-## Determining datatypes: `is.*` functions
+## Determining datatype: `is.*` functions
 
 # Preparing to Work
 
@@ -363,7 +310,7 @@ Return/Accept: NULL <- install.packages
 ```{r,eval=FALSE}
 rm(list = ls())
 install.packages("devtools")
-# Please referr to file devtools.log to see full output.
+# Please refer to file devtools.log to see full output.
 ```
 
 #### Upgrade by `update.packages()`
@@ -862,9 +809,9 @@ Function `data()` can import those datasets embedded in packages, or listing all
 ```{r}
 data(mpg)
 # datasets in ggplot2
-head(data(package = "ggplot2")$results,n=3)
+head(data(package = "ggplot2")$results, n = 3)
 # datasets available now
-head(data()$results,n=3)
+head(data()$results, n = 3)
 #data(package = .packages(all.available = TRUE))
 #list the data sets in all *available* packages.
 ```
@@ -912,7 +859,7 @@ Accept/Return: vector of integrals <- rnorm
 ```{r}
 rm(list = ls())
 a <- rnorm(2000, mean = 100, sd = 7)
-x<-seq(-10, 10, 0.1)
+x <- seq(-10, 10, 0.1)
 gghistogram(a)
 ```
 
@@ -927,15 +874,15 @@ Use `dnorm(val)` to get the Probability Density Function value for `val` in a di
 e.g.
 
 ```{r}
-x<-seq(-10, 10, 0.1)
-a<- data.frame(x = x, y=pnorm(x))
+x <- seq(-10, 10, 0.1)
+a <- data.frame(x = x, y = pnorm(x))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Normal Distribution")
-a<- data.frame(x = x, y=dnorm(x))
+        geom_line(aes(y = y)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Normal Distribution")
+a <- data.frame(x = x, y = dnorm(x))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Normal Distribution")
+        geom_line(aes(y = y)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Normal Distribution")
 ```
 
 Normal distributions can also be checked by *Normal Q-Q Plot* or *Shapiro-Wilk test*
@@ -943,7 +890,7 @@ Normal distributions can also be checked by *Normal Q-Q Plot* or *Shapiro-Wilk t
 #### Normal Q-Q Plot Example:
 
 ```{r}
-norm_sample<-sample(rnorm(1000,10,1),400)
+norm_sample <- sample(rnorm(1000, 10, 1), 400)
 hist(norm_sample)
 qqnorm(norm_sample)
 
@@ -963,17 +910,17 @@ Args:
 ```
 
 ```{r}
-x<-seq(-2, 5, 0.05)
-a <- rexp(2000, rate=2)
+x <- seq(-2, 5, 0.05)
+a <- rexp(2000, rate = 2)
 gghistogram(a)
-a<- data.frame(x = x, y=pexp(x))
+a <- data.frame(x = x, y = pexp(x))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Exponential Distribution")
-a<- data.frame(x = x, y=dexp(x))
+        geom_line(aes(y = y)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Exponential Distribution")
+a <- data.frame(x = x, y = dexp(x))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Exponential Distribution")
+        geom_line(aes(y = y)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Exponential Distribution")
 ```
 
 ### Uniform Distribution by `runif()`
@@ -981,17 +928,17 @@ ggplot(a, aes(x = x)) +
 Please note that it should be regarded as "r unif" instead of "run if".
 
 ```{r}
-x<-seq(-10, 10, 0.1)
+x <- seq(-10, 10, 0.1)
 a <- runif(2000, min = 0, max = 100)
 gghistogram(a)
-a<- data.frame(x = x, y=punif(x))
+a <- data.frame(x = x, y = punif(x))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Uniform Distribution")
-a<- data.frame(x = x, y=dunif(x))
+        geom_line(aes(y = y)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Uniform Distribution")
+a <- data.frame(x = x, y = dunif(x))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Uniform Distribution")
+        geom_line(aes(y = y)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Uniform Distribution")
 ```
 
 ### Student's T Distribution by `rt()`
@@ -1001,25 +948,25 @@ $$t=\frac{\bar{x}-\mu}{s/\sqrt{N}},$$
 where $\mu$ is the population mean, $\bar{x}$ is the sample mean, and $s$ is the estimator for population standard deviation.
 
 ```{r}
-x<-seq(-10, 10, 0.1)
+x <- seq(-10, 10, 0.1)
 a <- rt(2000, df = 2)
 gghistogram(a)
 # Dots = normal distribution
 # black, red, green: df = 1, 2, 3
-a<- data.frame(x = x, y1 = pt(x, 1), y2 = pt(x, 2), y3=pt(x, 3), yn = pt(x, 4))
+a <- data.frame(x = x, y1 = pt(x, 1), y2 = pt(x, 2), y3 = pt(x, 3), yn = pt(x, 4))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = yn)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Student's T Distribution")
-a<- data.frame(x = x, y1 = dt(x, 1), y2 = dt(x, 2), y3=dt(x, 3), yn = dt(x, 4))
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = yn)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Student's T Distribution")
+a <- data.frame(x = x, y1 = dt(x, 1), y2 = dt(x, 2), y3 = dt(x, 3), yn = dt(x, 4))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = yn)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Student's T Distribution")
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = yn)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Student's T Distribution")
 ```
 
 ### F distribution by `rf()`
@@ -1029,80 +976,80 @@ $$F=\frac{U/r_{1}}{V/r_{2}}$$
 follows an F-distribution with $r_{1}$ numerator degrees of freedom and $r_{2}$ denominator degrees of freedom. We write $F ~ F(r_{1},r_{2})$.
 
 ```{r}
-x<-seq(-2, 5, 0.05)
+x <- seq(-2, 5, 0.05)
 # Dots = normal distribution
 # black, red, green: df = 1, 2, 3
-a<- data.frame(x = x, y1 = pf(x, 1,81), y2 = pf(x, 81,1), y3=pf(x, 1,1), y4 = pf(x, 81,81))
+a <- data.frame(x = x, y1 = pf(x, 1, 81), y2 = pf(x, 81, 1), y3 = pf(x, 1, 1), y4 = pf(x, 81, 81))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = y4)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
-a<- data.frame(x = x, y1 = df(x, 1,81), y2 = df(x, 81,1), y3=df(x, 1,1), y4 = df(x, 81,81))
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = y4)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
+a <- data.frame(x = x, y1 = df(x, 1, 81), y2 = df(x, 81, 1), y3 = df(x, 1, 1), y4 = df(x, 81, 81))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = y4)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
-a<- data.frame(x = x, y1 = pf(x, Inf,1), y2 = pf(x, 1,Inf), y3 = pf(x, 1,1), y4 = pf(x, Inf,Inf))
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = y4)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
+a <- data.frame(x = x, y1 = pf(x, Inf, 1), y2 = pf(x, 1, Inf), y3 = pf(x, 1, 1), y4 = pf(x, Inf, Inf))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = y4)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
-a<- data.frame(x = x, y1 = df(x, Inf,1), y2 = df(x, 1,Inf), y3 = df(x, 1,1), y4 = df(x, Inf,Inf))
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = y4)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
+a <- data.frame(x = x, y1 = df(x, Inf, 1), y2 = df(x, 1, Inf), y3 = df(x, 1, 1), y4 = df(x, Inf, Inf))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = y4)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = y4)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
 ```
 
 ### Poisson Distribution by `rpois()`
 
 ```{r}
-x<-seq(0, 25, 1)
+x <- seq(0, 25, 1)
 a <- rpois(2000, lambda = 10)
 gghistogram(a)
 # Dots = normal distribution
 # black, red, green: lambda = 1, 5, 15
-a<- data.frame(x = x, y1 = ppois(x, 1), y2 = ppois(x, 5), y3=ppois(x, 15), yn = pnorm(x, 0))
+a <- data.frame(x = x, y1 = ppois(x, 1), y2 = ppois(x, 5), y3 = ppois(x, 15), yn = pnorm(x, 0))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = yn)) +
-  labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Poisson Distribution")
-a<- data.frame(x = x, y1 = dpois(x, 1), y2 = dpois(x, 5), y3=dpois(x, 15), yn = dnorm(x, 0))
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = yn)) +
+        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Poisson Distribution")
+a <- data.frame(x = x, y1 = dpois(x, 1), y2 = dpois(x, 5), y3 = dpois(x, 15), yn = dnorm(x, 0))
 ggplot(a, aes(x = x)) +
-  geom_line(aes(y = y1)) +
-  geom_line(aes(y = y2), color = "red") +
-  geom_line(aes(y = y3), color = "blue") +
-  geom_point(aes(y = yn)) +
-  labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Poisson Distribution")
+        geom_line(aes(y = y1)) +
+        geom_line(aes(y = y2), color = "red") +
+        geom_line(aes(y = y3), color = "blue") +
+        geom_point(aes(y = yn)) +
+        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Poisson Distribution")
 ```
 
 ### Chi-Square Distribution by `rchisq()`
 
 ```{r}
-x<-seq(0, 25, 1)
+x <- seq(0, 25, 1)
 a <- rchisq(2000, df = 10)
 gghistogram(a)
 # Dots = normal distribution
 # black, red, green: df = 1, 5, 15
-x<-seq(0, 25, 1)
-a<- data.frame(x = x, y1 = pchisq(x, 1), y2 = pchisq(x, 5), y3=pchisq(x, 15), yn = pnorm(x, 0))
+x <- seq(0, 25, 1)
+a <- data.frame(x = x, y1 = pchisq(x, 1), y2 = pchisq(x, 5), y3 = pchisq(x, 15), yn = pnorm(x, 0))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
         labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Chi-Square Distribution")
-a<- data.frame(x = x, y1 = dchisq(x, 1), y2 = dchisq(x, 5), y3=dchisq(x, 15), yn = dnorm(x, 0))
+a <- data.frame(x = x, y1 = dchisq(x, 1), y2 = dchisq(x, 5), y3 = dchisq(x, 15), yn = dnorm(x, 0))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
@@ -1113,7 +1060,9 @@ ggplot(a, aes(x = x)) +
 
 # Performing statistical tests by `stats`
 
-## Students' T-test by `t.test()`
+## Test to Distinguish whether two Samples are in the same Distribution
+
+### Students' T-test by `t.test()`
 
 ```{text}
 # Perform t-test using 2 datasets (in vector of numerals)
@@ -1125,9 +1074,7 @@ conf.level = 0.95)
 # Perform t-test using 1 dataset and mean (Arg: mu)
 t.test(x, mu = 0, alternative = c("two.sided", "less", "greater"),
 conf.level = 0.95, paired = FALSE)
-```
 
-```{r}
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), mu = 1)
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3))
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3), alternative = "greater")
@@ -1141,33 +1088,37 @@ t.test(data=mpg[1:10,],cty ~ cyl)
 
 The power of T-test can be checked by `power.t.test()`.
 
-## Wilcoxon rank sum test by `wilcox.test()`
+### Wilcoxon rank sum test by `wilcox.test()`
 
 Syntax similar to `t.test()`, but can be used when the sample is not that normal.
 
-## F test by `var.test()`
+### F test by `var.test()`
 
 Syntax similar to `t.test()`. It checks whether there's a difference in **VARIANCE**.
 
-## Shapiro-Wilk test by `shapiro.test()`
+## Test to Distinguish whether a Sample Obeys a Certain Distribution
+
+### Shapiro-Wilk test by `shapiro.test()`
 
 To test whether a dataset `x` is normally distributed.
 
 
 ```{r}
-shapiro.test(c(1,1,1,1,1,1,1,1,2))
-hist(c(1,1,1,1,1,1,1,1,2))
-shapiro.test(rnorm(1000,1,2))
-hist(rnorm(1000,1,2))
+shapiro.test(c(1, 1, 1, 1, 1, 1, 1, 1, 2))
+hist(c(1, 1, 1, 1, 1, 1, 1, 1, 2))
+shapiro.test(rnorm(1000, 1, 2))
+hist(rnorm(1000, 1, 2))
 ```
 
 ## Analysis of variance by `aov()`
 
-Omitted.
+TODO
 
-## Categorical Data Test
+Kruskal-Wallis 1-way test TODO
 
-## `chisq.test()` for Big Datasets
+## Test whether a/some Factor(s) Impact the Data
+
+### `chisq.test()` for Big Datasets
 
 e. g. For a matrix like
 
@@ -1176,7 +1127,7 @@ e. g. For a matrix like
 | R1   | a    | b    |
 | R2   | c    | d    |
 
-Firstly we calculate the expections.
+Firstly we calculate the expectations.
 
 |      | C1   | C2   | Sum     |
 | ---- | ---- | ---- | ------- |
@@ -1197,18 +1148,36 @@ $$
 $$
 
 And then you may find
+
 $$
 p=1-PDF(\chi^2)
 $$
 
 ```{r}
-mat_test <- matrix(data=c(84,82,82,57,34,11),nrow=2)
-dimnames(mat_test) <- list(Group=c("A","B"),Status=c("Good","Fair","Bad"))
+mat_test <- matrix(data = c(84, 82, 82, 57, 34, 11), nrow = 2)
+dimnames(mat_test) <- list(Group = c("A", "B"), Status = c("Good", "Fair", "Bad"))
 mat_test
 chisq.test(mat_test)
 ```
 
-## `fisher.test()` for Small Datasets
+Examples in more categories:
+
+| Genotype | Sex  | Alive | Dead |
+| -------- | ---- | ----- | ---- |
+| WT       | M    | a     | b    |
+| WT       | F    | c     | d    |
+| KO       | M    | e     | f    |
+| KO       | F    | g     | h    |
+
+For example,
+
+$$
+\bar{a}=\sum*\frac{\sum_{WT}}{\sum}\frac{\sum_{M}}{\sum}\frac{\sum_{Alive}}{\sum}
+$$
+
+How to test TODO.
+
+### `fisher.test()` for Small Datasets
 
 e. g. For a matrix like
 
@@ -1229,7 +1198,88 @@ Syntax similar to `chisq.test()`, but can be used when the sample size is small.
 
 ```{r}
 fisher.test(mat_test)
+rm(list = ls())
 ```
+
+## Test whether the Dataset can be Represented in a Linear Form
+
+### Linear Regression Using `lm()`
+
+Lines are fixed by minimizing sum of the *residuals*, which is
+
+$$
+\sum(Y-\hat{Y})^{2}
+$$
+
+where
+
+$$
+\hat{Y}=kX+b
+$$
+
+We define *sample correlation coefficient* (`r`) by
+
+$$
+r=\frac{Cov(x,y)}{\sqrt{(S_{x}^{2}(S_{y}^{2}))}}=\frac{\frac{\sum(Y-\hat{Y})(X-\hat{X})}{n-1}}{(\frac{\sum(X-\hat{X})^{2}}{n-1})(\frac{\sum(Y-\hat{Y})^{2}}{n-1})}=(n-1)\frac{\sum(Y-\hat{Y})(X-\hat{X})}{(\sum(X-\hat{X})^{2})(\sum(Y-\hat{Y})^{2})}
+$$
+
+with `r` ranges from -1 to 1. Thus,
+
+$$
+k=r\frac{S_{y}}{S_{x}}=r\frac{\sum(Y-\hat{Y})^{2}}{\sum(X-\hat{X})^{2}}
+$$
+
+$$
+b=\hat{Y}-k\hat{X}
+$$
+
+Residual Standard Error (RSE, Goodness of Fit)
+
+$$
+RSE=\sqrt{\frac{\sum(Y-\hat{Y})^{2}}{\sum(Y-\bar{Y})^{2}}}
+$$
+
+
+```{r}
+lm_women <- lm(weight ~ height, data = women)
+cor(women$height, women$weight)
+predict(lm_women,
+        data.frame(height = c(57, 75, 88)))
+residuals(lm_women)
+ggscatter(women, x = "height", y = "weight", add = "reg.line",
+          add.params = list(color = "blue", fill = "lightgray"), conf.int = TRUE)
+```
+
+TODO: Multiple factors
+
+# Performing statistical tests *de novo*
+
+## Bootstrap
+
+### Generating a Confidence Interval from Limited Number of Data
+
+e.g. Predict confidence interval of incremental levels from incremental levels
+
+```{r}
+rm(list = ls())
+covid <- data.frame(matrix(data = c(80796, 18, 12462, 3497, 10075, 1075), nrow = 3, byrow = TRUE))
+names(covid) <- c("Total", "New")
+covid$Country <- c("China", "Italy", "Iran")
+covid$rate <- covid$New / covid$Total
+covid$Old <- covid$Total - covid$New
+c <- data.frame(x = c(), y = c(), ymin = c(), ymax = c())
+for (Country in unique(covid$Country)) {
+  cc <- covid[covid$Country == Country, c("Old", "New", "Total")]
+  ccs <- c(replicate(cc$Old, "O"), replicate(cc$New, "N"))
+  ccb_n <- replicate(10, (sum(as.factor(sample(ccs, length(ccs), TRUE)) == "N") / cc$Total))
+  c <- rbind(c, data.frame(x = Country, y = c(cc$New / cc$Total), ymin = c(quantile(ccb_n, probs = c(0.025))), ymax = c(quantile(ccb_n, probs = c(0.975)))))
+}
+ggplot(data = c, aes(x = reorder(x, y), y = y)) +
+        geom_point() +
+        geom_errorbar(aes(ymin = ymin, ymax = ymax))
+```
+
+### Generating
 
 # Data cleaning by `tidyverse`: `tidyr` \& `dplyr`
 
@@ -1258,14 +1308,14 @@ Args:
 ```{r}
 rm(list = ls())
 stocks <- data.frame(
-  time = as.Date('2009-01-01') + 0:9,
-  X = rnorm(10, 0, 1),
-  Y = rnorm(10, 0, 2),
-  Z = rnorm(10, 0, 4)
+        time = as.Date('2009-01-01') + 0:9,
+        X = rnorm(10, 0, 1),
+        Y = rnorm(10, 0, 2),
+        Z = rnorm(10, 0, 4)
 )
-head(stocks,n=3)
+head(stocks, n = 3)
 stocksm <- stocks %>% gather("stock", "price", -time)
-head(stocksm,n=3)
+head(stocksm, n = 3)
 ```
 
 ### Long to wide: `spread()`
@@ -1529,7 +1579,7 @@ Args:
 ```{r}
 rm(list = ls())
 boxplot(mpg$cty, mpg$hwy, col = c("red", "green"),
-		names = c("city miles per gallon", "highway miles per gallon"))
+        names = c("city miles per gallon", "highway miles per gallon"))
 boxplot(mpg$cty, mpg$hwy, notch = TRUE, horizontal = TRUE)
 ```
 
@@ -1560,16 +1610,16 @@ Args:
 ```
 
 ```{r}
-plot(c(1:5),c(11:15),type="b")
+plot(c(1:5), c(11:15), type = "b")
 ```
 
-## Mosaic Plot by `mosaicplot`
+### Mosaic Plot by `mosaicplot`
 
 e.g.
 
 ```{r}
-mat_test <- matrix(data=c(84,82,82,57,34,11),nrow=2)
-dimnames(mat_test) <- list(Group=c("A","B"),Status=c("Good","Fair","Bad"))
+mat_test <- matrix(data = c(84, 82, 82, 57, 34, 11), nrow = 2)
+dimnames(mat_test) <- list(Group = c("A", "B"), Status = c("Good", "Fair", "Bad"))
 mosaicplot(mat_test)
 ```
 
@@ -1671,8 +1721,8 @@ Args:
 
 ```{r}
 fruits <- c(
-  "apples and oranges and pears and bananas",
-  "pineapples and mangos and guavas"
+        "apples and oranges and pears and bananas",
+        "pineapples and mangos and guavas"
 )
 
 str_split(fruits, " and ")
@@ -1690,6 +1740,36 @@ Args:
     sep <- a character. To separate the terms. Not NA_character_.
 ```
 
+# Machine Learning
+
+## Clustering using `ClusterR`
+
+```{r}
+rm(list=ls())
+# remove any missing value (i.e, NA values for not available)
+USArrests <- na.omit(USArrests) #view the first 6 rows of the data
+head(USArrests, n=6)
+# Normalize large variations
+df <- scale(USArrests)
+
+## Compute the gap statistic
+gap_stat <- clusGap(df, FUN = kmeans, nstart = 25, K.max = 10, B = 500)
+# Plot the result
+fviz_gap_stat(gap_stat)
+km.res <- kmeans(df, 4, nstart = 25)
+# Visualize clusters using factoextra
+fviz_cluster(km.res, USArrests)
+
+
+# eclust can automatically perform satistical tests in best effect
+res.km <- eclust(df, "kmeans")
+res.hc <- eclust(df, "hclust")
+fviz_cluster(res.hc) # scatter plot
+```
+
+
 # TODO
 
 `aov`
+
+Machine learning
