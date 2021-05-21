@@ -49,6 +49,7 @@ library(factoextra)
 library(cluster)
 library(stringr)
 library(nnet)
+library(lsr)
 # Source global data
 data("mpg")
 data("women")
@@ -61,7 +62,7 @@ TODO: Add parallel
 
 ## Replicate a function by `replicate()`
 
-```{r}
+```{r replicate}
 rm(list = ls())
 c1 <- replicate(10, mean(sample(rnorm(100, 0, 100)), 20))
 # Equals to:
@@ -77,23 +78,7 @@ for (i in c(1:10)) {
 
 ### Generate or combine a vector by `c()` or `seq()`
 
-```{text}
-c(x...)
-
-Args:
-    x <- vectors.
-        Return/Accept: vectors <- c
-    x <- none-vector objects.
-        Return/Accept: list <- c
-
-seq(from, to, by = 1)
-
-Args: Omitted.
-
-Return/Accept: vectors <- seq
-```
-
-```{r}
+```{r c}
 rm(list = ls())
 a <- seq(1, 10, by = 2) # Generate a vector.
 a
@@ -108,7 +93,7 @@ c # This gives a list.
 
 ### Determine whether an item is inside a vector by `%in%`
 
-```{r}
+```{r in}
 1 %in% c(1, 2, 3)
 c(1, 2) %in% c(1, 2, 3)
 ```
@@ -117,26 +102,20 @@ c(1, 2) %in% c(1, 2, 3)
 
 ### Generate a matrix by `matrix()`
 
-```{text}
-matrix(data = NA, nrow = 1, ncol = 1, byrow = FALSE)
-Args:
-    data <- vector. The data used.
-    nrow <- integral. Number of rows.
-    ncol <- integral. Number of columns.
-    byrow <- logic. Fill by row or column.
-```
-
-```{r}
+```{r matrix}
 rm(list = ls())
-a <- matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3)
-a
-a <- matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3, byrow = TRUE)
-a
+matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3)
+matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3, byrow = TRUE)
+matrix(data = c(9, 2, 3, 4, 5, 6), nrow = 2, byrow = TRUE,
+       dimnames = list(ROW_NAMES = c("a", "b"),
+                       COL_NAMES = c("c", "d", "e")))
 ```
 
 ### Access an element by `name[row,col]`
 
-```{r}
+```{r brackets}
+rm(list = ls())
+a <- matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3, byrow = TRUE)
 a[1, 1]
 a[1,]
 a[, 1]
@@ -151,14 +130,7 @@ a[a[, 1] > 5,]
 
 ### Generate a dataframe by `data.frame()`
 
-```{text}
-data.frame(x..., stringsAsFactors = default.stringsAsFactors())
-Args:
-    x... <- data. usually in a form of col_name=value(vector).
-    stringsAsFactors <- Omitted.
-```
-
-```{r}
+```{r data.frame}
 rm(list = ls())
 a <- data.frame(x1 = 1:5, x2 = 6:10)
 a
@@ -166,22 +138,13 @@ a
 
 ### Access can be done by `name[row,col]` \& `name$col_name`
 
-```{r}
+```{r dollar}
 a$x1
 ```
 
 ### Get/Set column names by `names()`
 
-```{text}
-names(x)
-
-Args:
-    x <- Dataframe/List
-
-Return/Accept: vector (Name now) <- names <- vector (Name to set)
-```
-
-```{r}
+```{r names}
 rm(list = ls())
 a <- c("l1", "l2") # a is a vector
 names(a)
@@ -195,11 +158,24 @@ names(a) <- c("l1", "l2", "l3")
 names(a)
 ```
 
-There is a similiar function named `dimname()`, which allows you to change names in different dimentions. E.g. Column or row.
+There is a similar function named `dimnames()`, which allows you to change names in different dimensions. E.g. Column or row.
+
+
+```{r dimnames}
+rm(list = ls())
+a <- matrix(data = c(9, 2, 3, 4, 5, 6),
+            ncol = 3, byrow = TRUE,
+            dimnames = list(ROW_NAMES = c("a", "b"),
+                            COL_NAMES = c("c", "d", "e")))
+dimnames(a)
+dimnames(a) <- list(ROW_NAMES = c("1", "2"),
+                    COL_NAMES = c("3", "4", "5"))
+dimnames(a)
+```
 
 ### Bind dataframes by `rbind()` \& `cbind()` \& `merge`
 
-```{r}
+```{r rbind}
 rm(list = ls())
 a <- data.frame(1:5, 6:10)
 b <- data.frame(11:15, 16:20)
@@ -219,16 +195,9 @@ merge(a, b, by = "ab")
 
 ### Generate a list by `list()`
 
-```{text}
-list(x...)
-Args:
-    x... <- data. usually in a form of item_name=value(R Object).
-```
-
-```{r}
+```{r list}
 rm(list = ls())
-a <- list(x1 = c(1:5), x2 = data.frame(df1 = 1:5, df2 = 6:10))
-a
+list(x1 = c(1:5), x2 = data.frame(df1 = 1:5, df2 = 6:10))
 ```
 
 ### Access members by `name[[item_index]]` or `name$item_name`
@@ -237,23 +206,21 @@ Omitted.
 
 ## function
 
-```{text}
-function_name <- function (aglist) {
-    ...
-    return(XXX)
-}
-```
-
-```{r}
+```{r function}
 rm(list = ls())
 dice <- function(max) { return(sample(c(1:max), 1, replace = FALSE)); }
-a <- dice(6)
-a
+dice(6)
 ```
 
 ## Conversions between datatype: `as.*` functions
 
-## Determining datatype: `is.*` functions
+TODO
+
+## Determining datatype: `is.*`, `str()` or `class()` functions
+
+TODO
+
+For `str()` or `class()` functions, see below.
 
 # Preparing to Work
 
@@ -261,30 +228,16 @@ a
 
 Remove all variables \& functions inside the memory and turn off all graphical devices.
 
-```{r}
+```{r cleanup, eval=FALSE}
 rm(list = ls())
 dev.off()
 ```
 
 ## Working Directory
 
-Set the working directory by `setwd()`.
+Set the working directory by `setwd()` and get the working directory by `getwd()`.
 
-```{text}
-setwd(x)
-Args:
-    x <- character. Where to go.
-Return/Accept: character (Where we are) <- setwd
-```
-
-Get the working directory by `getwd()`.
-
-```{text}
-getwd()
-Return/Accept: character (Where we are) <- getwd
-```
-
-```{r,eval = FALSE}
+```{r setwd,eval = FALSE}
 rm(list = ls())
 setwd('~/Documents')
 getwd()
@@ -296,19 +249,7 @@ getwd()
 
 #### Installation by `install.packages()`
 
-```{text}
-install.packages(x, repos=getOption("repos"), method = "auto")
-
-Args:
-    x<-character One package only
-    x<-vector(character) Multiple Packages
-    repos <- character. The URL you want to use. If [BLANK], will ask.
-    method <- referr2 download.file()
-
-Return/Accept: NULL <- install.packages
-```
-
-```{r,eval=FALSE}
+```{r install.packages,eval=FALSE}
 rm(list = ls())
 install.packages("devtools")
 # Please refer to file devtools.log to see full output.
@@ -316,25 +257,14 @@ install.packages("devtools")
 
 #### Upgrade by `update.packages()`
 
-```{text}
-update.packages(repos=getOption("repos"), method = "auto", ask = TRUE)
-
-Args:
-    repos <- referr2 install.packages()
-    method <- referr2 install.packages()
-    ask <- logical. Whether to ask before upgrading every package.
-
-Return/Accept: referr2 install.packages()
-```
-
-```{r,eval=FALSE}
+```{r update.packages ,eval=FALSE}
 rm(list = ls())
 update.packages(ask = FALSE)
 ```
 
 #### Loading a package by `library()`
 
-```{r,eval=FALSE}
+```{r library,eval=FALSE}
 # Load tidyverse
 library(tidyverse)
 ```
@@ -345,7 +275,7 @@ library(tidyverse)
 
 `build()` builds a package file from package sources. You can use it to build a binary version of your package.
 
-```{r,eval=FALSE}
+```{r devtools,eval=FALSE}
 # Firstly we clone dplyr into our local folder `dplyr`.
 git2r::clone("https://github.com/tidyverse/dplyr/", "dplyr")
 devtools::install_local("dplyr") # Install dplyr
@@ -366,7 +296,7 @@ You may also install packages by `install_bitbucket()` & `install_github()` & `i
 
 e.g. install `biomaRt` by `BioConductor`:
 
-```{r,eval=FALSE}
+```{r biocmanager,eval=FALSE}
 install.packages("BiocManager")
 BiocManager::install("biomaRt")
 # Please referr to file biomart.log to see full output.
@@ -380,7 +310,7 @@ BiocManager::install(update = TRUE, ask = FALSE)
 
 ### File download by `downloader` package
 
-```{r,eval=FALSE}
+```{r downloader,eval=FALSE}
 # Download an R file:
 # (We may use http://sf.R as filename)
 downloader::download("http://sf.R")
@@ -425,10 +355,9 @@ Args:
     row.names <- logical. Write row names or not.
     row.names <- vector. What to erite as rwo names.
     col.names <- referr2 row.names.
-    fileEncoding <- ?
 ```
 
-```{r}
+```{r write}
 rm(list = ls())
 write.table(mpg, file = "mpg.tsv", sep = "\t")
 ```
@@ -470,11 +399,11 @@ Args:
 Return/Accept: dataframe <- read.table
 ```
 
-```{r}
+```{r read}
 rm(list = ls())
 a <- read.delim("mpg.tsv")
 head(a)
-unlink("mpg.tsv")
+unlink("mpg.tsv") # Delete this file
 ```
 
 ## Package `readr` (FAILED)
@@ -542,17 +471,7 @@ Args:
 
 ## Getting the first/last n rows and header by `head()`/`tail()`
 
-```{text}
-head(x,n=6)
-
-Args:
-    x <- dataframe.
-    n <- integral <= dim(x).
-
-tail(x) referr2 `head()`.
-```
-
-```{r}
+```{r head tail}
 rm(list = ls())
 head(mpg)
 head(mpg, n = 3)
@@ -560,13 +479,9 @@ tail(mpg)
 tail(mpg, n = 3)
 ```
 
-## Getting the last n rows and header by `tail()`
-
-
-
 ## Getting length and width of an object by `length()` \& `dim()` \& `nrow()` \& `ncol()`
 
-```{r}
+```{r length dim nrow ncol}
 rm(list = ls())
 b <- c(1:5)
 length(b) # How long a vector is.
@@ -584,30 +499,7 @@ rm(b)
 
 ## Select data by `which()` \& `which.*()`
 
-```{text}
-which(x)
-
-Give the indices of TRUE within a vector of logicals.
-
-Args:
-    x <- vector of logicals.
-
-Return/Accept: vector of integrals <- which
-
-which.max(x)
-
-Give the indix of the first maximun value within a vector of numerals.
-
-Args:
-    x <- vector of numerals.
-
-Return/Accept: vector of integrals <- which.max
-
-which.min referr2 which.max
-
-```
-
-```{r}
+```{r which}
 rm(list = ls())
 b <- mpg$hwy >= 24
 head(b) # Cars with highway miles per gallon >=24
@@ -624,16 +516,7 @@ which.min(c(1:5))
 
 ## Get mean/sd/quarters of each column by `summary()`
 
-```{text}
-summary(x)
-
-Args:
-    x <- R objects.
-
-Return/Accept: summaryDefault <- summary
-```
-
-```{r}
+```{r summary}
 rm(list = ls())
 summary(c(1:5))
 summary(mpg)
@@ -641,31 +524,13 @@ summary(mpg)
 
 ## Get statistics of vector by `mean()` \& `meian()` \& `sd()` \& `sum()`
 
-```{text}
-mean(x)
-
-Args:
-    x <- numeric/logical vectors.
-
-Return/Accept: numeric <- mean
-
-median & sd & sum referr2 mean
-```
+Omitted
 
 Have to use numeric/logical vectors, otherwise `NA` will be returned. Omitted.
 
 ## Get structure of R objects by `str()`
 
-```{text}
-str(x)
-
-Args:
-    x <- R object.
-
-Return/Accept: NULL <- str
-```
-
-```{r}
+```{r str}
 rm(list = ls())
 b <- c(1:5)
 str(b)
@@ -676,16 +541,7 @@ str(mpg)
 
 ## Get the data type of object by `class()`
 
-```{text}
-class(x)
-
-Args:
-    x <- R object.
-
-Return/Accept: character <- class
-```
-
-```{r}
+```{r class}
 rm(list = ls())
 class(c(1:5))
 class(matrix(data = c(9, 2, 3, 4, 5, 6), ncol = 3))
@@ -694,16 +550,7 @@ class(data.frame(x1 = 1:5, x2 = 6:10))
 
 ## Get/Set object attribute lists by `attributes()`
 
-```{text}
-attributes(x)
-
-Args:
-    x <- R object.
-
-Return/Accept: list <- attributes
-```
-
-```{r}
+```{r attributes}
 rm(list = ls())
 date1 <- as.POSIXct("2020-01-07", tz = "GMT")
 attributes(date1)
@@ -715,27 +562,7 @@ date1
 
 ## Determine/Eliminate the existence of NA by `anyNA()` \& `complete.cases()` \& `na.omit()` \& `tidyr::drop_na()`
 
-```{text}
-anyNA(x)
-
-anyNA shows whether there is NA inside.
-
-Args:
-    x <- R object.
-
-Return/Accept: logical <- anyNA
-
-complete.cases(x)
-
-complete.cases shows whether there is NA inside each column (case).
-
-Args:
-    x <- R object.
-
-Return/Accept: vector of logical <- complete.cases
-```
-
-```{r}
+```{r renove NA}
 rm(list = ls())
 a <- data.frame(x1 = c(1, 2, 3, NA, 5), x2 = 6:10)
 anna <- data.frame(x1 = c(1:5), x2 = 6:10)
@@ -755,50 +582,21 @@ complete.cases(anna)
 complete.cases(a)
 a[complete.cases(a),]
 na.omit(a)
-na.exclude(a) # ???
+na.exclude(a) # TODO
 tidyr::drop_na(a)
+apply(is.na(a), 2, which)
 ```
-
-You may also use `apply(is.na(data),2,which)` to get NA rows and columns.
 
 ## Determine/Eliminate the existence of dulicates by `duplicated()` and `unique()`
 
-```{text}
-duplicated(x)
-
-Will return duplicated indecies.
-
-Args:
-    x <- vector/dataframe.
-
-Return/Accept: vector of logicals <- duplicated
-```
-
-```{r}
+```{r duplicated unique}
 rm(list = ls())
 head(duplicated(mpg))
 which(duplicated(mpg))
+sum(duplicated(mpg))
 dim(mpg)
-dedup <- mpg[which(!duplicated(mpg)),] # SLOW!
-dim(dedup)
-```
-
-```{text}
-unique(x)
-
-Will return vector/dataframe without duplicates.
-
-Args:
-    x <- vector/dataframe.
-
-Return/Accept: vector/dataframe <- unique
-```
-
-```{r}
-rm(list = ls())
-dim(mpg)
-dedup <- unique(mpg)
-dim(dedup)
+dim(mpg[which(!duplicated(mpg)),]) # SLOW!
+dim(unique(mpg))
 ```
 
 # Generating new data from existing data \& *de novo*
@@ -807,37 +605,31 @@ dim(dedup)
 
 Function `data()` can import those datasets embedded in packages, or listing all available datasets if no arguments provided.
 
-```{r}
+```{r data}
 data(mpg)
 # datasets in ggplot2
 head(data(package = "ggplot2")$results, n = 3)
 # datasets available now
 head(data()$results, n = 3)
-#data(package = .packages(all.available = TRUE))
-#list the data sets in all *available* packages.
+# data(package = .packages(all.available = TRUE))
+# list the data sets in all *available* packages.
 ```
 
 ## Random sampling by `sample()`
 
-```{text}
-sample(x, size, replace = FALSE, prob = NULL)
-
-Args:
-    x <- vector/dataframe.
-    size <- integral. How many?
-    replace <- logical. Allow duplicates?
-    prob <- vector of numerals with the sum 1.
-        probabilities/weights of each element in x.
-```
-
-```{r}
+```{r sample}
 rm(list = ls())
 a <- c(1:5)
 sample(a, 1)
 sample(a, 10, replace = TRUE)
-sample(a, 10, replace = TRUE, prob = c(0.1, 0.2, 0.3, 0.4, 0.0))
+sample(a, 10, replace = TRUE,
+       prob = c(0.1, 0.2, 0.3, 0.4, 0.0))
 mpg[sample(seq_along(mpg$hwy), 5),]
 # seq_along is a safer version of c(1:...)
+
+# Sample skills
+# To reorder records randomly
+order(runif(c(1:10)))
 ```
 
 ## *de novo* generation of data by  `stats`
@@ -846,18 +638,7 @@ mpg[sample(seq_along(mpg$hwy), 5),]
 
 Normal Distribution is a bell-shaped frequency distribution curve which helps describe all the possible values a random variable can take within a given range with most of the distribution area is in the middle and few are in the tails, at the extremes.
 
-```{text}
-rnorm(n, mean = 0, sd = 1)
-
-Args:
-    n <- integral. How many?
-    mean <- numeral. Mean?
-    sd <- numeral. Standard deviation?
-
-Accept/Return: vector of integrals <- rnorm
-```
-
-```{r}
+```{r rnorm}
 rm(list = ls())
 a <- rnorm(2000, mean = 100, sd = 7)
 x <- seq(-10, 10, 0.1)
@@ -874,222 +655,268 @@ Use `dnorm(val)` to get the Probability Density Function value for `val` in a di
 
 e.g.
 
-```{r}
+```{r pnorm dnorm}
 x <- seq(-10, 10, 0.1)
 a <- data.frame(x = x, y = pnorm(x))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Normal Distribution")
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for Normal Distribution")
 a <- data.frame(x = x, y = dnorm(x))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Normal Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for Normal Distribution")
 ```
 
 Normal distributions can also be checked by *Normal Q-Q Plot* or *Shapiro-Wilk test*
 
-#### Normal Q-Q Plot Example:
-
-```{r}
-norm_sample <- sample(rnorm(1000, 10, 1), 400)
-hist(norm_sample)
-qqnorm(norm_sample)
-
-shapiro.test(norm_sample)
-rm(norm_sample)
-```
-
-
 ### Exponential Distribution by `rexp()`
 
-```{text}
-rexp(n, rate = 1)
-
-Args:
-    n <- referr2 rnorm
-    rate <- numeral.
-```
-
-```{r}
+```{r rexp}
 x <- seq(-2, 5, 0.05)
-a <- rexp(2000, rate = 2)
+a <- rexp(n = 2000, rate = 2)
 gghistogram(a)
 a <- data.frame(x = x, y = pexp(x))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Exponential Distribution")
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for Exponential Distribution")
 a <- data.frame(x = x, y = dexp(x))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Exponential Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for Exponential Distribution")
 ```
 
 ### Uniform Distribution by `runif()`
 
 Please note that it should be regarded as "r unif" instead of "run if".
 
-```{r}
+```{r runif}
 x <- seq(-10, 10, 0.1)
-a <- runif(2000, min = 0, max = 100)
+a <- runif(n = 2000, min = 0, max = 100)
 gghistogram(a)
 a <- data.frame(x = x, y = punif(x))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Uniform Distribution")
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for Uniform Distribution")
 a <- data.frame(x = x, y = dunif(x))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Uniform Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for Uniform Distribution")
 ```
 
 ### Student's T Distribution by `rt()`
 
-A statistical distribution published by William Gosset in 1908. His employer, Guinness Breweries, required him to publish under a pseudonym, so he chose "Student". Given $N$ independent measurements $x_{i}$, let let
-$$t=\frac{\bar{x}-\mu}{s/\sqrt{N}},$$
+A statistical distribution published by William Gosset in 1908. His employer, Guinness Breweries, required him to publish under a pseudonym, so he chose "Student". Given $N$ independent measurements $x_{i}$, let
+
+$$
+t=\frac{\bar{x}-\mu}{s/\sqrt{N}}
+$$
+
 where $\mu$ is the population mean, $\bar{x}$ is the sample mean, and $s$ is the estimator for population standard deviation.
 
-```{r}
+```{r rt}
 x <- seq(-10, 10, 0.1)
-a <- rt(2000, df = 2)
+a <- rt(n = 2000, df = 2)
 gghistogram(a)
 # Dots = normal distribution
 # black, red, green: df = 1, 2, 3
-a <- data.frame(x = x, y1 = pt(x, 1), y2 = pt(x, 2), y3 = pt(x, 3), yn = pt(x, 4))
+a <- data.frame(x = x,
+                y1 = pt(x, 1),
+                y2 = pt(x, 2),
+                y3 = pt(x, 3),
+                yn = pt(x, 4))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Student's T Distribution")
-a <- data.frame(x = x, y1 = dt(x, 1), y2 = dt(x, 2), y3 = dt(x, 3), yn = dt(x, 4))
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for Student's T Distribution")
+a <- data.frame(x = x,
+                y1 = dt(x, 1),
+                y2 = dt(x, 2),
+                y3 = dt(x, 3),
+                yn = dt(x, 4))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Student's T Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for Student's T Distribution")
 ```
 
 ### F distribution by `rf()`
 
 If U and V are independent chi-square random variables with $r_{1}$ and $r_{2}$ degrees of freedom, respectively, then:
-$$F=\frac{U/r_{1}}{V/r_{2}}$$
+
+$$
+F=\frac{U/r_{1}}{V/r_{2}}
+$$
+
 follows an F-distribution with $r_{1}$ numerator degrees of freedom and $r_{2}$ denominator degrees of freedom. We write $F ~ F(r_{1},r_{2})$.
 
-```{r}
+```{r rf}
 x <- seq(-2, 5, 0.05)
 # Dots = normal distribution
 # black, red, green: df = 1, 2, 3
-a <- data.frame(x = x, y1 = pf(x, 1, 81), y2 = pf(x, 81, 1), y3 = pf(x, 1, 1), y4 = pf(x, 81, 81))
+a <- data.frame(x = x,
+                y1 = pf(x, df1 = 1, df2 = 81),
+                y2 = pf(x, df1 = 81, df2 = 1),
+                y3 = pf(x, df1 = 1, df2 = 1),
+                y4 = pf(x, df1 = 81, df2 = 81))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = y4)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
-a <- data.frame(x = x, y1 = df(x, 1, 81), y2 = df(x, 81, 1), y3 = df(x, 1, 1), y4 = df(x, 81, 81))
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for F Distribution")
+a <- data.frame(x = x,
+                y1 = df(x, 1, 81),
+                y2 = df(x, 81, 1),
+                y3 = df(x, 1, 1),
+                y4 = df(x, 81, 81))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = y4)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
-a <- data.frame(x = x, y1 = pf(x, Inf, 1), y2 = pf(x, 1, Inf), y3 = pf(x, 1, 1), y4 = pf(x, Inf, Inf))
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for F Distribution")
+a <- data.frame(x = x,
+                y1 = pf(x, Inf, 1),
+                y2 = pf(x, 1, Inf),
+                y3 = pf(x, 1, 1),
+                y4 = pf(x, Inf, Inf))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = y4)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for F Distribution")
-a <- data.frame(x = x, y1 = df(x, Inf, 1), y2 = df(x, 1, Inf), y3 = df(x, 1, 1), y4 = df(x, Inf, Inf))
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for F Distribution")
+a <- data.frame(x = x,
+                y1 = df(x, Inf, 1),
+                y2 = df(x, 1, Inf),
+                y3 = df(x, 1, 1),
+                y4 = df(x, Inf, Inf))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = y4)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for F Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for F Distribution")
 ```
 
 ### Poisson Distribution by `rpois()`
 
-```{r}
+```{r rpois}
 x <- seq(0, 25, 1)
 a <- rpois(2000, lambda = 10)
 gghistogram(a)
 # Dots = normal distribution
 # black, red, green: lambda = 1, 5, 15
-a <- data.frame(x = x, y1 = ppois(x, 1), y2 = ppois(x, 5), y3 = ppois(x, 15), yn = pnorm(x, 0))
+a <- data.frame(x = x,
+                y1 = ppois(x, lambda = 1),
+                y2 = ppois(x, lambda = 5),
+                y3 = ppois(x, lambda = 15),
+                yn = pnorm(x, mean = 0))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Poisson Distribution")
-a <- data.frame(x = x, y1 = dpois(x, 1), y2 = dpois(x, 5), y3 = dpois(x, 15), yn = dnorm(x, 0))
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for Poisson Distribution")
+a <- data.frame(x = x,
+                y1 = dpois(x, 1),
+                y2 = dpois(x, 5),
+                y3 = dpois(x, 15),
+                yn = dnorm(x, 0))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Poisson Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for Poisson Distribution")
 ```
 
 ### Chi-Square Distribution by `rchisq()`
 
-```{r}
+```{r rchisq}
 x <- seq(0, 25, 1)
 a <- rchisq(2000, df = 10)
 gghistogram(a)
 # Dots = normal distribution
 # black, red, green: df = 1, 5, 15
 x <- seq(0, 25, 1)
-a <- data.frame(x = x, y1 = pchisq(x, 1), y2 = pchisq(x, 5), y3 = pchisq(x, 15), yn = pnorm(x, 0))
+a <- data.frame(x = x,
+                y1 = pchisq(x, df = 1),
+                y2 = pchisq(x, df = 5),
+                y3 = pchisq(x, df = 15),
+                yn = pnorm(x, mean = 0))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
-        labs(x = "X", y = "CDF(X)", title = "Cumulated Distribution Function for Chi-Square Distribution")
-a <- data.frame(x = x, y1 = dchisq(x, 1), y2 = dchisq(x, 5), y3 = dchisq(x, 15), yn = dnorm(x, 0))
+        labs(x = "X", y = "CDF(X)",
+             title = "Cumulated Distribution Function for Chi-Square Distribution")
+a <- data.frame(x = x,
+                y1 = dchisq(x, 1),
+                y2 = dchisq(x, 5),
+                y3 = dchisq(x, 15),
+                yn = dnorm(x, 0))
 ggplot(a, aes(x = x)) +
         geom_line(aes(y = y1)) +
         geom_line(aes(y = y2), color = "red") +
         geom_line(aes(y = y3), color = "blue") +
         geom_point(aes(y = yn)) +
-        labs(x = "X", y = "PDF(X)", title = "Probability Distribution Function for Chi-Square Distribution")
+        labs(x = "X", y = "PDF(X)",
+             title = "Probability Distribution Function for Chi-Square Distribution")
 ```
 
 # Performing statistical tests by `stats`
 
-## Test to Distinguish whether two Samples are in the same Distribution
+## Test to Compare Two Means
 
-### Students' T-test by `t.test()`
+### Students'/Welch's T-test by `t.test()`
 
-```{text}
-# Perform t-test using 2 datasets (in vector of numerals)
-t.test(x, y = NULL, alternative = c("two.sided", "less", "greater"),
-conf.level = 0.95)
+Can test:
 
+* Whether the mean of a sample is equal to predicted mean
+* Whether the mean of two different group is the same
 
+Prerequisites:
 
-# Perform t-test using 1 dataset and mean (Arg: mu)
-t.test(x, mu = 0, alternative = c("two.sided", "less", "greater"),
-conf.level = 0.95, paired = FALSE)
+* Normal
+* IID (if not paired)
+* Homogeneity of variance (if not Welch)
 
-t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), mu = 1)
-t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3))
+```{r t.test}
+t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), mu = 1) # One sample
+t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3)) # Welch Two Sample t-test
+t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3), var.equal = TRUE) # Students' t-test
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3), alternative = "greater")
 t.test(c(1, 2, 3, 4, 5, 5, 6, 7, 8, 9), c(1, 2, 3), alternative = "less")
-head(mpg,n=10)
+head(mpg, n = 10)
 # Perform t-test using 2 columns of one dataset
-t.test(x=mpg$cty,y=mpg$hwy)
+t.test(x = mpg$cty, y = mpg$hwy)
 # Perform t-test using groups
-t.test(data=mpg[1:10,],cty ~ cyl)
+t.test(data = mpg[1:10,], cty ~ cyl)
 ```
 
 The power of T-test can be checked by `power.t.test()`.
 
-### Wilcoxon rank sum test by `wilcox.test()`
+### Wilcoxon Rank Sum Test by `wilcox.test()`
 
 Syntax similar to `t.test()`, but can be used when the sample is not that normal.
 
@@ -1097,29 +924,195 @@ Syntax similar to `t.test()`, but can be used when the sample is not that normal
 
 Syntax similar to `t.test()`. It checks whether there's a difference in **VARIANCE**.
 
-## Test to Distinguish whether a Sample Obeys a Certain Distribution
+## Test to Compare Several Means
 
-### Shapiro-Wilk test by `shapiro.test()`
+### One-way ANOVA (Analyse of Variance) using `aov()`
+
+To assess more than one aspect of one factor's impact.
+
+e.g. effect of 3 doses of a drug on heart rate
+
+Assumptions:
+
+* Independent random sampling
+* Normality of residuals
+* Equality of Variances
+
+```{r aov}
+rm(list = ls())
+diseases <- data.frame(x = c(2.9, 3.0, 2.5,
+                             2.6, 3.2, 3.8,
+                             2.7, 4.0, 2.4,
+                             2.8, 3.4, 3.7,
+                             2.2, 2.0),
+                       g = factor(rep(1:3, c(5, 4, 5)),
+                                  labels = c("Normal subjects",
+                                             "Subjects with obstructive airway disease",
+                                             "Subjects with asbestosis")))
+disease_aov <- aov(x ~ g, diseases)
+summary(disease_aov)
+coefficients(disease_aov)
+shapiro.test(resid(disease_aov)) # Normality
+bartlett.test(x ~ g, diseases)
+plot(disease_aov, 1) # Equality of variance
+TukeyHSD(disease_aov) # Tukey’s HSD (Honestly Significant Difference) test
+```
+
+### One-way Welch Test by `oneway.test()`
+
+Syntax similar to `aov()`, but can be used when the sample's variance is different.
+
+```{r oneway.test}
+rm(list = ls())
+diseases <- data.frame(x = c(2.9, 3.0, 2.5,
+                             2.6, 3.2, 3.8,
+                             2.7, 4.0, 2.4,
+                             2.8, 3.4, 3.7,
+                             2.2, 2.0),
+                       g = factor(rep(1:3, c(5, 4, 5)),
+                                  labels = c("Normal subjects",
+                                             "Subjects with obstructive airway disease",
+                                             "Subjects with asbestosis")))
+oneway.test(x ~ g, diseases)
+```
+
+### Kruskal-Wallis Rank Sum Test by `kruskal.test()`
+
+Syntax similar to `aov()`, but can be used when the sample is not that normal.
+
+```{r kruskal.test}
+rm(list = ls())
+diseases <- data.frame(x = c(2.9, 3.0, 2.5,
+                             2.6, 3.2, 3.8,
+                             2.7, 4.0, 2.4,
+                             2.8, 3.4, 3.7,
+                             2.2, 2.0),
+                       g = factor(rep(1:3, c(5, 4, 5)),
+                                  labels = c("Normal subjects",
+                                             "Subjects with obstructive airway disease",
+                                             "Subjects with asbestosis")))
+kruskal.test(x ~ g, diseases)
+```
+
+### n-way (Factorial) ANOVA using `aov()`
+
+e.g. To assess the effect of block, N, P, K on Peas
+
+```{r multi-aov}
+rm(list = ls())
+aggregate(yield ~ N * P * K, npk, mean) # To sum the data using N, P, K only
+npk_aov <- aov(yield ~ block + N * P * K, npk)
+summary(npk_aov)
+coefficients(npk_aov)
+shapiro.test(resid(npk_aov)) # Normality
+plot(npk_aov, 1) # Equality of variance
+TukeyHSD(npk_aov)
+```
+
+## Test to Distinguish Variance Equality
+
+### Bartlett Test of Homogeneity of Variances Using `bartlett.test()`
+
+```{r bartlett.test}
+rm(list = ls())
+diseases <- data.frame(x = c(2.9, 3.0, 2.5,
+                             2.6, 3.2, 3.8,
+                             2.7, 4.0, 2.4,
+                             2.8, 3.4, 3.7,
+                             2.2, 2.0),
+                       g = factor(rep(1:3, c(5, 4, 5)),
+                                  labels = c("Normal subjects",
+                                             "Subjects with obstructive airway disease",
+                                             "Subjects with asbestosis")))
+bartlett.test(x ~ g, diseases)
+```
+
+## Test to Distinguish whether a Sample Obeys Normal Distribution
+
+### Shapiro-Wilk Test by `shapiro.test()`
 
 To test whether a dataset `x` is normally distributed.
 
-
-```{r}
+```{r shapiro.test}
+rm(list = ls())
 shapiro.test(c(1, 1, 1, 1, 1, 1, 1, 1, 2))
 hist(c(1, 1, 1, 1, 1, 1, 1, 1, 2))
 shapiro.test(rnorm(1000, 1, 2))
 hist(rnorm(1000, 1, 2))
 ```
 
-## Analysis of variance by `aov()`
+### Normal Q-Q Plot by `qqnorm()`
 
-TODO
+```{r qqnorm}
+rm(list = ls())
+norm_sample <- sample(rnorm(n = 1000, mean = 10, sd = 1), 400)
+hist(norm_sample)
+qqnorm(norm_sample)
 
-Kruskal-Wallis 1-way test TODO
+shapiro.test(norm_sample)
+rm(norm_sample)
+```
 
 ## Test whether a/some Factor(s) Impact the Data
 
+Definition of Categorical Data:
+
+* Values only chosen from discrete and finite values (categories)
+* Values are mutually exclusive. Each subject can only choose one category
+* Nominal and ordinal
+* Nominal variables have no particular order: Hair color, race, gender…
+* Ordinal variables have some inherent ordering: Pain levels, ratings…
+
 ### `chisq.test()` for Big Datasets
+
+#### An 1-Way Example (Goodness-of-Fit)
+
+We compare our data to a "model" (many times these models have percentages and we need to remember to convert these percentages to "counts"),and only one population.
+
+e. g. For a matrix like
+
+|      | C1   | Predict |
+| ---- | ---- | ------- |
+| R1   | a    | a'      |
+| R2   | c    | b'      |
+
+$$
+\chi^2=\sum(\frac{(O-E)^2}{E})=\sum_{i=\{a,b\}}\frac{(i-i')^2}{i'}
+$$
+
+And then you may find
+
+$$
+p=1-PDF(\chi^2)
+$$
+
+Define degree of freedom ($df$):
+
+df=number of cells - # of pieces of sample information required for computing expected cell frequencies.
+
+In 1-way example,
+
+$$
+df=c-1
+$$
+
+```{r 1way chisq}
+rm(list = ls())
+mat_test <- matrix(data = c(0.1, 0.41, 0.49, 0.1, 0.4, 0.5),
+                   byrow = TRUE, nrow = 2)
+dimnames(mat_test) <- list(Group = c("Actual", "Except"),
+                           Status = c("Good", "Fair", "Bad"))
+mat_test
+chisq.test(mat_test)
+# This matrix should be tested by
+chisq.test(x = c(0.1, 0.41, 0.49), p = c(0.1, 0.4, 0.5))
+```
+
+#### An 2-Way Example
+
+Test for Homogeneity: Compare two or more different populations, one categorical variable
+
+Test for Independence/Association: We have one population and want to compare two or more variables
 
 e. g. For a matrix like
 
@@ -1127,6 +1120,8 @@ e. g. For a matrix like
 | ---- | ---- | ---- |
 | R1   | a    | b    |
 | R2   | c    | d    |
+
+We wish to test whether the distribution of R1 and R2 in C1 and C2 is the same
 
 Firstly we calculate the expectations.
 
@@ -1148,20 +1143,25 @@ $$
 \chi^2=\sum(\frac{(O-E)^2}{E})=\sum_{i=\{a,b,c,d\}}\frac{(i-i')^2}{i'}
 $$
 
-And then you may find
-
-$$
-p=1-PDF(\chi^2)
-$$
-
-```{r}
-mat_test <- matrix(data = c(84, 82, 82, 57, 34, 11), nrow = 2)
-dimnames(mat_test) <- list(Group = c("A", "B"), Status = c("Good", "Fair", "Bad"))
+```{r 2way chisq}
+rm(list = ls())
+mat_test <- matrix(data = c(0.1, 0.41, 0.49, 0.1, 0.4, 0.5),
+                   byrow = TRUE, nrow = 2)
+dimnames(mat_test) <- list(Group = c("Group A", "Group B"),
+                           Status = c("Good", "Fair", "Bad"))
 mat_test
-chisq.test(mat_test)
+mat_chisq <- chisq.test(mat_test)
+mat_chisq$observed
+mat_chisq$expected
 ```
 
-Examples in more categories:
+in a 2-way example,
+
+$$
+df=(r-1)(c-1)
+$$
+
+#### Examples in more categories (3-way):
 
 | Genotype | Sex  | Alive | Dead |
 | -------- | ---- | ----- | ---- |
@@ -1176,7 +1176,7 @@ $$
 \bar{a}=\sum*\frac{\sum_{WT}}{\sum}\frac{\sum_{M}}{\sum}\frac{\sum_{Alive}}{\sum}
 $$
 
-How to test TODO.
+How to test in R TODO.
 
 ### `fisher.test()` for Small Datasets
 
@@ -1197,14 +1197,56 @@ p=\frac{\prod(\sum \text{of each column \& row})}{\prod \text{of each cell and i
 $$
 Syntax similar to `chisq.test()`, but can be used when the sample size is small.
 
-```{r}
-fisher.test(mat_test)
+```{r fisher.test}
 rm(list = ls())
+mat_test <- matrix(data = c(10, 41, 49, 10, 40, 50),
+                   byrow = TRUE, nrow = 2)
+dimnames(mat_test) <- list(Group = c("Group A", "Group B"),
+                           Status = c("Good", "Fair", "Bad"))
+mat_test
+fisher.test(mat_test)
+```
+
+### `mcnemar.test()` for Marginal Homogeneity
+
+e. g. To test whether the answer to a question (Y/N) have changed after teaching
+
+|         | Before:Y | Before:N |
+| ------- | -------- | -------- |
+| After:Y | 5        | 1        |
+| After:N | 5        | 9        |
+
+```{r mcnemar.test}
+rm(list = ls())
+mat_test <- matrix(data = c(5, 5, 1, 9), byrow = TRUE, nrow = 2)
+dimnames(mat_test) <- list(Before = c("Y", "N"), After = c("Y", "N"))
+mat_test
+mcnemar.test(mat_test)
 ```
 
 ## Test whether the Dataset can be Represented in a Linear Form
 
+### Correlation Testing Using `cor.test()`
+
+```{r cor.test}
+cor.test(women$height, women$weight)
+x <- c(1:50)
+cor.test(x, 2 * x + 1)
+cor.test(x, x^2)
+cor.test(x, runif(50, 0, 50))
+```
+
 ### Linear Regression Using `lm()`
+
+Prerequisites:
+
+* Normality and independency of the residuals
+* Linearity
+* Homogeneity of variance
+* Uncorrelated predictors
+* No significant outliers
+
+#### 1-factor (Simple) Linear Regression
 
 Lines are fixed by minimizing sum of the *residuals*, which is
 
@@ -1240,15 +1282,42 @@ $$
 RSE=\sqrt{\frac{\sum(Y-\hat{Y})^{2}}{\sum(Y-\bar{Y})^{2}}}
 $$
 
+$R^{2}$, or the coefficient of determinator
 
-```{r}
+TODO: Errors here
+
+$$
+R^{2}=1-RSE^2
+$$
+
+means that the predictor explains $R^{2}$ of the variance in the outcome.
+
+```{r lm}
+rm(list = ls())
 lm_women <- lm(weight ~ height, data = women)
 cor(women$height, women$weight)
 predict(lm_women,
         data.frame(height = c(57, 75, 88)))
-residuals(lm_women)
-ggscatter(women, x = "height", y = "weight", add = "reg.line",
-          add.params = list(color = "blue", fill = "lightgray"), conf.int = TRUE)
+summary(lm_women)
+# Multiple R-squared: R^{2}
+# Adjusted...
+ggscatter(women, x = "height", y = "weight",
+          add = "reg.line",
+          add.params = list(color = "blue", fill = "lightgray"),
+          conf.int = TRUE)
+```
+
+#### n-factor Linear Regression
+
+Take 2 way for example. The formular will become:
+
+$$
+y=k_{1}x_{1}+k_{2}x_{2}+b
+$$
+
+```{r}
+rm(list = ls())
+lm_iris <- lm(formula = Sepal.Length ~ Sepal.Width + Species, data = iris)
 ```
 
 TODO: Multiple factors
@@ -1257,28 +1326,99 @@ TODO: Multiple factors
 
 ## Bootstrap
 
-### Generating a Confidence Interval from Limited Number of Data
+### Case Resampling: Generating a Confidence Interval from Limited Number of Data
+
+e.g. Generate confidence interval of mean from samples of unknown distribution
+
+1. Randomly select LENGTH observations from the sample, with replacement after each selection. Some observations may be selected more than once, and some may not be selected at all.
+2. Calculate and record the sample mean.
+3. Repeat the first two steps 1,000 times.
+4. Order the 1,000 sample means from smallest to largest.
+5. Find the sample means representing the 2.5th and 97.5th percentiles. In this case, it’s the 25th number from the bottom and top. These are your 95% confidence limits.
+
+```{r Case Resampling}
+my_bootstrap <- function(x) {
+  my_means <- replicate(1000, {
+    mean(sample(x, length(x), replace = TRUE))
+  })
+  hist(my_means)
+  return(list(mean = mean(my_means),
+              up = quantile(my_means, probs = c(0.975)),
+              low = quantile(my_means, probs = c(0.025))))
+}
+my_bootstrap(c(1:10))
+```
 
 e.g. Predict confidence interval of incremental levels from incremental levels
 
-```{r}
-rm(list = ls())
-covid <- data.frame(matrix(data = c(80796, 18, 12462, 3497, 10075, 1075), nrow = 3, byrow = TRUE))
+```{r Case Resampling 2}
+covid <- data.frame(matrix(data = c(80796, 18, 12462, 3497, 10075, 1075),
+                           nrow = 3, byrow = TRUE))
 names(covid) <- c("Total", "New")
 covid$Country <- c("China", "Italy", "Iran")
-covid$rate <- covid$New / covid$Total
 covid$Old <- covid$Total - covid$New
 c <- data.frame(x = c(), y = c(), ymin = c(), ymax = c())
 for (Country in unique(covid$Country)) {
   cc <- covid[covid$Country == Country, c("Old", "New", "Total")]
-  ccs <- c(replicate(cc$Old, "O"), replicate(cc$New, "N"))
-  ccb_n <- replicate(10, (sum(as.factor(sample(ccs, length(ccs), TRUE)) == "N") / cc$Total))
-  c <- rbind(c, data.frame(x = Country, y = c(cc$New / cc$Total), ymin = c(quantile(ccb_n, probs = c(0.025))), ymax = c(quantile(ccb_n, probs = c(0.975)))))
+  ccb_n <- my_bootstrap(c(replicate(cc$Old, 0),
+                          replicate(cc$New, 1)))
+  c <- rbind(c, data.frame(x = Country,
+                           y = ccb_n$mean,
+                           ymin = ccb_n$low,
+                           ymax = ccb_n$up))
 }
 ggplot(data = c, aes(x = reorder(x, y), y = y)) +
         geom_point() +
         geom_errorbar(aes(ymin = ymin, ymax = ymax))
 ```
+
+### Permutation Test: Whether a Factor Influences the Data
+
+This can be used to test whether a factor influences the data by comparing different statistics.
+
+Use t-test if the statistics is mean.
+
+* Sample (without replacement)
+* Sample size is size of original dataset
+* This essentially amounts to re-distributing labels
+* Compare between new samples with different labels
+* Repeat many times
+
+e.g. Assess whether there's a difference in median of two groups.
+
+```{r Permutation Test}
+rm(list = ls())
+data <- data.frame(grp1 = c(1, 2, 3, 4, 5), grp2 = c(2, 3, 4, 5, 6))
+t.test(data$grp1, data$grp2)
+# Now we wish to test MEDIAN
+meian_bootstrap <- function(x, y) {
+  merged <- c(x, y)
+  xlen <- length(x)
+  ylen <- length(y)
+  allen <- xlen + ylen
+  values <- replicate(1000, {
+    neworder <- merged[order(runif(c(1:allen)))]
+    newx <- neworder[1:xlen]
+    newy <- neworder[xlen + 1:ylen]
+    median(newx) - median(newy)
+  })
+  hist(values)
+  return(list(mean = mean(values),
+              up = quantile(values, probs = c(0.975)),
+              low = quantile(values, probs = c(0.025))))
+}
+meian_bootstrap(data$grp1, data$grp2)
+
+
+
+```
+
+### Parametric bootstrap
+
+* If the real-world distribution is known, we can just simulate the drawing of samples from such a distribution
+* E.g. knowing population is normally distributed with given $\mu$ and $\sigma$ allows us to sample from that distribution (More realistic scenario: Overall outcome is a combination of events with known probabilities)
+* Simulated sample is compared to actually measured sample
+* Repeat many times
 
 ### Generating
 
@@ -1292,21 +1432,8 @@ Rather than forcing the user to either save intermediate objects or nest functio
 `tidyr` provides tools to help to create tidy data, where each column is a variable, each row is an observation, and each cell contains a single value. `tidyr` contains tools for changing the shape (pivoting) and hierarchy (nesting and 'unnesting') of a dataset, turning deeply nested lists into rectangular data frames ('rectangling'), and extracting values out of string columns. It also includes tools for working with missing values (both implicit and explicit).
 
 ### Wide to long: `gather()`
-```{text}
-gather(data, key = "key", value = "value", ...,
-na.rm = FALSE, convert = FALSE, factor_key = FALSE)
 
-Args:
-    data <- dataframe.
-    key, value <- character. Names of new key and value columns.
-    ... referr2 dplyr::select()
-    na.rm <- logical. Remove NA.
-    factor_key <- logical. If FALSE, the default, the key values will be stored as a
-        character vector. If TRUE, will be stored as a factor, which preserves the original
-        ordering of the columns.
-```
-
-```{r}
+```{r gather}
 rm(list = ls())
 stocks <- data.frame(
         time = as.Date('2009-01-01') + 0:9,
@@ -1321,17 +1448,7 @@ head(stocksm, n = 3)
 
 ### Long to wide: `spread()`
 
-```{text}
-spread(data, key, value, fill = NA)
-
-Args:
-    data <- reffer2 gather()
-    key <- reffer2 gather()
-    value <- reffer2 gather()
-    fill <- If set, missing values will be replaced with this value.
-```
-
-```{r}
+```{r spread}
 stocksm %>% spread("stock", "price")
 stocksm %>% spread("time", "price")
 ```
@@ -1350,7 +1467,7 @@ Please be aware that `dplyr` do not cooperate very will with NAs. Have them remo
 
 You have to use `dplyr::filter` due to the conflicts. We'll use `mpg` dataset from `ggplot2`
 
-```{r}
+```{r filter}
 rm(list = ls())
 dim(mpg)
 dim(dplyr::filter(mpg))
@@ -1364,7 +1481,7 @@ dim(mpg %>% dplyr::filter(hwy >= 24))
 
 ### select rows by `slice()`
 
-```{r}
+```{r slice}
 slice(mpg, 1:3)
 # Which is equal to:
 mpg[1:3,]
@@ -1382,7 +1499,7 @@ slice_max(mpg, hwy, n = 3)
 
 ### Select columns by `select()`
 
-```{r}
+```{r select}
 head(select(mpg, cty, hwy), n = 3)
 # Use : to select range of columns
 head(select(mpg, trans:hwy), n = 3)
@@ -1403,7 +1520,7 @@ head(select(mpg, contains("y")), n = 3)
 
 To sort the dataset by the column provded by arguments.
 
-```{r}
+```{r arrange}
 mpg1 <- slice_sample(mpg, n = 20)
 mpg1
 arrange(mpg1, year, hwy)
@@ -1417,7 +1534,7 @@ mpg1[order(-mpg1$year, mpg1$hwy),]
 
 This function generates a new column based on old columns.
 
-```{r}
+```{r mutate transmutate}
 head(mutate(mpg1, diff = hwy - cty), n = 3)
 # Which is equal to:
 head(transform(mpg1, diff = hwy - cty), n = 3)
@@ -1425,9 +1542,9 @@ head(transform(mpg1, diff = hwy - cty), n = 3)
 head(transmute(mpg1, diff = hwy - cty), n = 3)
 ```
 
-### Remane columns with `rename()`
+### Rename columns with `rename()`
 
-```{r}
+```{r rename}
 head(rename(mpg, make = manufacturer, mod = model), n = 3)
 # Change the values when select by `select()`
 head(select(mpg, make = manufacturer, mod = model), n = 3)
@@ -1437,7 +1554,7 @@ head(select(mpg, make = manufacturer, mod = model), n = 3)
 
 Use a similar syntax as `select()` to move blocks of columns at once.
 
-```{r}
+```{r relocate}
 head(relocate(mpg, year:fl, .before = model), n = 3)
 # You may also use `.after`
 ```
@@ -1450,68 +1567,13 @@ head(relocate(mpg, year:fl, .before = model), n = 3)
 
 In this example, we will use `plot(a)` as our plot, which should be:
 
-```{r, eval = FALSE}
+```{r plot}
 rm(list = ls())
 a <- rnorm(5, mean = 100, sd = 7)
 plot(a)
 ```
 
-```{text}
-bmp(filename = "Rplot%03d.bmp", width = 480, height = 480,
-units = "px", pointsize = 12, bg = "white", res = NA, family = "")
-
-jpeg(filename = "Rplot%03d.jpg", width = 480, height = 480,
-units = "px", pointsize = 12, quality = 75, bg = "white", res = NA, family = "")
-
-png(filename = "Rplot%03d.png", width = 480, height = 480,
-units = "px", pointsize = 12, bg = "white", res = NA, family = "")
-
-tiff(filename = "Rplot%03d.tif", width = 480, height = 480,
-units = "px", pointsize = 12, bg = "white", res = NA, family = "")
-
-Args:
-    filename <- character. Output filename.
-    width <- numeric. Width of the device.
-    height <- numeric. Height of the device.
-    units <- character. Units of height and width.
-        Avail: px (Default), in, cm, mm
-    pointsize <- integral. Point size.
-    bg <- character. Background color.
-    res <- integral. Resolution (Default=72).
-    family <- character. Font family.
-
-pdf(file = if(onefile) "Rplots.pdf" else "Rplot%03d.pdf",
-width = 7, height = 7, onefile = TRUE, family = "Helvetica",
-title = "R Graphics Output", version = "1.4", paper = "special",
-encoding, bg = "transparent", fg = "black", pointsize = 12)
-
-postscript(file = if(onefile) "Rplots.ps" else "Rplot%03d.ps",
-onefile = TRUE, family = "Helvetica", width = 0, height = 0,
-title = "R Graphics Output", horizontal = TRUE, pointsize = 12,
- paper = "special", pagecentre = TRUE)
-
-svg(filename = if(onefile) "Rplots.svg" else "Rplot%03d.svg",
-width = 7, height = 7, pointsize = 12, onefile = FALSE,
-family = "sans", bg = "white")
-
-Args:
-    file <- referr2 png
-    width <- referr2 png
-    height <- referr2 png
-    onefile <- logic. Use one file for all outputs.
-    family <- referr2 png
-    title <- character. Title of the picture.
-    version <- character. PDF version.
-    paper <- character. Paper size.
-        Avail: "a4", "letter" (or "us"), "legal", "executive"
-    horizontal <- logical. the orientation of the printed image.
-    pointsize <- referr2 png
-    bg <- referr2 png
-    Fg <- character. Foreground color.
-    pagecentre <- logical. Where to put the picture.
-```
-
-```{r, eval = FALSE}
+```{r plotting devices, eval = FALSE}
 png(filename = "demo.png", bg = "white")
 plot(a)
 dev.off()
@@ -1539,45 +1601,17 @@ dev.off()
 
 ### Histogram: `hist()`
 
-```{text}
-hist(x, col = "lightgray", main = paste("Histogram of" , xname),
-xlim = range(breaks), ylim = NULL, xlab = xname, ylab)
-
-Args:
-    x <- vector of numerals. What to plot.
-    col <- character. Color used.
-    main <- character. Title.
-    xlim <- range. Range of X axis.
-    ylim <- range. Range of Y axis.
-    xlab <- character. X axis lables.
-    ylab <- character. Y axis lables.
-```
-
-```{r}
+```{r hist}
 rm(list = ls())
-hist(mpg$hwy, col = "red", xlab = "highway miles per gallon", ylab = "Frequency of highway miles per gallon")
+hist(mpg$hwy,
+     col = "red",
+     xlab = "highway miles per gallon",
+     ylab = "Frequency of highway miles per gallon")
 ```
 
 ### Boxplot: `boxplot()`
 
-```{text}
-boxplot(x..., range = 1.5, width = NULL, varwidth = FALSE,
-notch = FALSE, outline = TRUE, \border = par("fg"),
-col = "lightgray", horizontal = FALSE, names)
-
-Args:
-    x... <- referr2 hist
-    width <- vector of numerals. Width of boxes.
-    varwidth <- logical. The boxes are drawn with widths proportional to
-        the square-roots of the number of observations in the groups.
-    notch <- logical. Draw notches.
-    outline <- logical. Draw outlines.
-    col <- referr2 hist
-    horizontal <- logical. Change direction.
-    names <- vector of characters. Change the name of x-axis.
-```
-
-```{r}
+```{r boxplot}
 rm(list = ls())
 boxplot(mpg$cty, mpg$hwy, col = c("red", "green"),
         names = c("city miles per gallon", "highway miles per gallon"))
@@ -1586,41 +1620,16 @@ boxplot(mpg$cty, mpg$hwy, notch = TRUE, horizontal = TRUE)
 
 ### Scatter plot \& line plot: `plot()`
 
-```{text}
-plot(x, y, type = "p")
-
-Args:
-    x <- vector. the coordinates of points in the plot.
-    y <- vector. the y coordinates of points in the plot, optional if x is an
-        appropriate structure.
-    type <- character. what type of plot should be drawn.
-        Avail:
-            "p" for points,
-            "l" for lines,
-            "b" for both,
-            "c" for the lines part alone of "b",
-            "o" for both ‘overplotted’,
-            "h" for ‘histogram’ like (or ‘high-density’) vertical lines,
-            "s" for stair steps,
-            "S" for other steps, see ‘Details’ below,
-            "n" for no plotting.
-    main <- character. an overall title for the plot.
-    sub <- character. a sub title for the plot.
-    xlab <- character. a title for the x axis.
-    ylab <- character. a title for the y axis.
-```
-
-```{r}
+```{r plot_b}
 plot(c(1:5), c(11:15), type = "b")
 ```
 
 ### Mosaic Plot by `mosaicplot`
 
-e.g.
-
-```{r}
+```{r mosiacplot}
 mat_test <- matrix(data = c(84, 82, 82, 57, 34, 11), nrow = 2)
-dimnames(mat_test) <- list(Group = c("A", "B"), Status = c("Good", "Fair", "Bad"))
+dimnames(mat_test) <- list(Group = c("A", "B"),
+                           Status = c("Good", "Fair", "Bad"))
 mosaicplot(mat_test)
 ```
 
@@ -1658,19 +1667,7 @@ Args:
 
 ## Getting substrings by `str_sub()`
 
-```{text}
-str_sub(string, start = 1L, end = -1L)
-
-Args:
-    string <- character. input character vector.
-    start, end <- Two integer vectors. start gives the position of the
-        first character (defaults to first), end gives the position of
-        the last (defaults to last character). Alternatively, pass a
-        two-column matrix to start.
-        Negative values count backwards from the last character.
-```
-
-```{r}
+```{r str_sub}
 hw <- c("Hadley Wickham")
 str_sub(hw, 1, 6)
 str_sub(hw, end = 6)
@@ -1687,40 +1684,15 @@ str_sub(hw, c(1, 8), c(6, 14))
 
 ## Replace with regex by `str_replace()` \& `str_replace_all()` \& `gsub()`
 
-```{text}
-str_replace(string, pattern, replacement)
-str_replace_all(string, pattern, replacement)
-
-Args:
-    string <- referr2 str_sub()
-    pattern <- character. Regex pattern to look for.
-    replacement <- character. A character vector of replacements.
-        Should be either length one, or the same length as string or pattern.
-        References of the form \1, \2, etc will be replaced with the contents
-        of the respective matched group (created by ()).
-```
-
-```{r}
+```{r str_replace}
 fruits <- c("one apple", "two pears", "three bananas")
 str_replace(fruits, "([aeiou])", "\\1\\1")
 str_replace(fruits, "[aeiou]", c("1", "2", "3"))
 ```
 
-str_split
+## Split strings by `str_split()`
 
-```{text}
-str_split(string, pattern, n = Inf, simplify = FALSE)
-
-Args:
-    string <- referr2 str_sub()
-    pattern <- referr2 str_sub()
-    n <- integral. number of pieces to return. Default (Inf) uses all possible
-        split positions.
-    simplify <- logical. If FALSE, the default, returns a list of character vectors.
-        If TRUE returns a character matrix.
-```
-
-```{r}
+```{r str_split}
 fruits <- c(
         "apples and oranges and pears and bananas",
         "pineapples and mangos and guavas"
@@ -1732,24 +1704,16 @@ str_split(fruits, " and ", simplify = TRUE)
 
 ## Join strings together by `paste()` or `paste0()`
 
-```{text}
-paste (..., sep=" ")
-paste0(...) <- paste(..., sep="")
-
-Args:
-    ... <- R objects. To be converted to character vectors.
-    sep <- a character. To separate the terms. Not NA_character_.
-```
+Omitted
 
 # Machine Learning
 
 ## Clustering using `factoextra` `cluster`
 
-```{r}
+```{r cluster}
 rm(list = ls())
 # remove any missing value (i.e, NA values for not available)
-USArrests <- na.omit(USArrests) #view the first 6 rows of the data
-head(USArrests, n = 6)
+USArrests <- na.omit(USArrests)
 # Normalize large variations
 df <- scale(USArrests)
 
@@ -1772,18 +1736,29 @@ fviz_cluster(res.hc) # scatter plot
 
 ### `keras` on `iris` Dataset
 
-```{r}
+```{r keras}
 summary(iris)
 iris_rand <- iris[order(runif(dim(iris)[1])),]
 iris_as <- list(train = list(
-        x = as.matrix(iris_rand[1:100, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]),
+        x = as.matrix(iris_rand[1:100, c("Sepal.Length",
+                                         "Sepal.Width",
+                                         "Petal.Length",
+                                         "Petal.Width")]),
         y = as.numeric(iris_rand[1:100, "Species"]) - 1),
                 test = list(
-                        x = as.matrix(iris_rand[101:150, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]),
-                        y = as.numeric(iris_rand[101:150, "Species"]) - 1))
+                        x = as.matrix(
+                                iris_rand[101:150,
+                                          c("Sepal.Length",
+                                            "Sepal.Width",
+                                            "Petal.Length",
+                                            "Petal.Width")]),
+                        y = as.numeric(iris_rand[101:150,
+                                                 "Species"]) - 1))
 model <- keras_model_sequential() %>%
-        layer_flatten(input_shape = c(1, 4)) %>% # Flatten a given input, does not affect the batch size.
-        layer_dense(units = 128, activation = "relu") %>% # Set hidden layers with relu activation function
+        # Flatten a given input, does not affect the batch size.
+        layer_flatten(input_shape = c(1, 4)) %>%
+        # Set hidden layers with relu activation function
+        layer_dense(units = 128, activation = "relu") %>%
         layer_dense(units = 128, activation = "relu") %>%
         layer_dense(units = 128, activation = "relu") %>%
         layer_dense(units = 128, activation = "relu") %>%
@@ -1811,26 +1786,32 @@ model %>%
 
 ### `nnet` on `iris` Dataset
 
-```{r}
+```{r nnet}
 iris_rand <- iris[order(runif(dim(iris)[1])),]
-train<-(iris_rand[1:100,])
-test<-(iris_rand[101:150,])
+train <- (iris_rand[1:100,])
+test <- (iris_rand[101:150,])
 
-iris.nn <- nnet(Species ~ ., data = train, size = 5, rang = 0.1, decay = 5e-4, maxit = 200)
+iris.nn <- nnet(Species ~ ., data = train,
+                size = 5, rang = 0.1,
+                decay = 5e-4, maxit = 200)
 iris.predict <- predict(iris.nn, test, type = "class")
-table(test$Species,iris.predict)
+table(test$Species, iris.predict)
 ```
 
 ### `Torch` HelloWorld
 
-```{r,eval=FALSE}
+```{r torch,eval=FALSE}
 library(palmerpenguins)
 penguins_dataset <- dataset(
         name = "penguins_dataset",
         initialize = function(df) {
           df <- na.omit(df)
           # continuous input data (x_cont)
-          x_cont <- df[, c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "year")] %>%
+          x_cont <- df[, c("bill_length_mm",
+                           "bill_depth_mm",
+                           "flipper_length_mm",
+                           "body_mass_g",
+                           "year")] %>%
                   as.matrix()
           self$x_cont <- torch_tensor(x_cont)
           # categorical input data (x_cat)
@@ -1843,7 +1824,9 @@ penguins_dataset <- dataset(
           self$y <- torch_tensor(species)
         },
         .getitem = function(i) {
-          list(x_cont = self$x_cont[i,], x_cat = self$x_cat[i,], y = self$y[i])
+          list(x_cont = self$x_cont[i,],
+               x_cat = self$x_cat[i,],
+               y = self$y[i])
         },
         .length = function() {
           self$y$size()[[1]]
@@ -1856,10 +1839,15 @@ train_dl <- train_ds %>% dataloader(batch_size = 16, shuffle = TRUE)
 valid_dl <- valid_ds %>% dataloader(batch_size = 16, shuffle = FALSE)
 embedding_module <- nn_module(
         initialize = function(cardinalities) {
-          self$embeddings <- nn_module_list(lapply(cardinalities, function(x) nn_embedding(num_embeddings = x, embedding_dim = ceiling(x / 2))))
+          self$embeddings <- nn_module_list(
+                  lapply(cardinalities,
+                         function(x) nn_embedding(
+                                 num_embeddings = x,
+                                 embedding_dim = ceiling(x / 2))))
         },
         forward = function(x) {
-          embedded <- vector(mode = "list", length = length(self$embeddings))
+          embedded <- vector(mode = "list",
+                             length = length(self$embeddings))
           for (i in seq_along(self$embeddings)) {
             embedded[[i]] <- self$embeddings[[i]](x[, i])
           }
@@ -1873,13 +1861,16 @@ net <- nn_module(
                               fc_dim,
                               output_dim) {
           self$embedder <- embedding_module(cardinalities)
-          self$fc1 <- nn_linear(sum(purrr::map(cardinalities, function(x) ceiling(x / 2)) %>% unlist()) + n_cont, fc_dim)
+          self$fc1 <- nn_linear(sum(purrr::map(
+                  cardinalities, function(x) ceiling(x / 2))
+                                            %>% unlist()) + n_cont, fc_dim)
           self$output <- nn_linear(fc_dim, output_dim)
         },
 
         forward = function(x_cont, x_cat) {
           embedded <- self$embedder(x_cat)
-          all <- torch_cat(list(embedded, x_cont$to(dtype = torch_float())), dim = 2)
+          all <- torch_cat(
+                  list(embedded, x_cont$to(dtype = torch_float())), dim = 2)
           all %>%
                   self$fc1() %>%
                   nnf_relu() %>%
@@ -1888,7 +1879,8 @@ net <- nn_module(
         }
 )
 model <- net(
-        cardinalities = c(length(levels(penguins$island)), length(levels(penguins$sex))),
+        cardinalities = c(length(levels(penguins$island)),
+                          length(levels(penguins$sex))),
         n_cont = 5,
         fc_dim = 32,
         output_dim = 3
@@ -1913,30 +1905,27 @@ for (epoch in 1:20) {
     loss <- nnf_nll_loss(output, b$y)
     valid_losses <- c(valid_losses, loss$item())
   })
-  cat(sprintf("Loss at epoch %d: training: %3.3f, validation: %3.3f\n", epoch, mean(train_losses), mean(valid_losses)))
+  cat(sprintf("Loss at epoch %d: training: %3.3f, validation: %3.3f\n",
+              epoch, mean(train_losses), mean(valid_losses)))
 }
 ```
 
 ## Decision-Making Tree
 ### `C50` on `iris` Dataset
 
-```{r}
+```{r C50}
 iris_rand <- iris[order(runif(dim(iris)[1])),]
-train<-(iris_rand[1:100,])
-test<-(iris_rand[101:150,])
-iris.c50 <- C5.0(train[,c("Petal.Width","Petal.Length","Sepal.Width","Sepal.Length")],train$Species)
+train <- (iris_rand[1:100,])
+test <- (iris_rand[101:150,])
+iris.c50 <- C5.0(
+        train[, c("Petal.Width", "Petal.Length", "Sepal.Width", "Sepal.Length")],
+        train$Species)
 iris.predict <- predict(iris.c50, test, type = "class")
-table(test$Species,iris.predict)
+table(test$Species, iris.predict)
 ```
-
-# TODO
-
-`aov`
-
-Machine learning
 
 # What we Have Now?
 
-```{r}
+```{r End}
 sessionInfo()
 ```
