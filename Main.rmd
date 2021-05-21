@@ -34,20 +34,21 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.width = 16)
 knitr::opts_chunk$set(cache = TRUE)
 sessionInfo()
-# Check for installed packages
-installed <- installed.packages()[, 1]
-for (packages in c("tidyverse", "ggubr",
-                   "knitr", "rmarkdown", "stringr",
-                   "corrplot",
-                   "factoextra","cluster")) {
-  if (!packages %in% installed) {
-    simpleError(paste0("Package ", packages, " not installed."))
-  }
-}
+version
+
 # Source global packages
 library(tidyverse)
 library(ggpubr)
 library(corrplot)
+library(keras)
+library(tensorflow)
+library(torch)
+library(C50)
+library(pheatmap)
+library(factoextra)
+library(cluster)
+library(stringr)
+library(nnet)
 # Source global data
 data("mpg")
 data("women")
@@ -1742,13 +1743,13 @@ Args:
 
 # Machine Learning
 
-## Clustering using `ClusterR`
+## Clustering using `factoextra` `cluster`
 
 ```{r}
-rm(list=ls())
+rm(list = ls())
 # remove any missing value (i.e, NA values for not available)
 USArrests <- na.omit(USArrests) #view the first 6 rows of the data
-head(USArrests, n=6)
+head(USArrests, n = 6)
 # Normalize large variations
 df <- scale(USArrests)
 
@@ -1767,9 +1768,175 @@ res.hc <- eclust(df, "hclust")
 fviz_cluster(res.hc) # scatter plot
 ```
 
+## Neuron Network
+
+### `keras` on `iris` Dataset
+
+```{r}
+summary(iris)
+iris_rand <- iris[order(runif(dim(iris)[1])),]
+iris_as <- list(train = list(
+        x = as.matrix(iris_rand[1:100, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]),
+        y = as.numeric(iris_rand[1:100, "Species"]) - 1),
+                test = list(
+                        x = as.matrix(iris_rand[101:150, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]),
+                        y = as.numeric(iris_rand[101:150, "Species"]) - 1))
+model <- keras_model_sequential() %>%
+        layer_flatten(input_shape = c(1, 4)) %>% # Flatten a given input, does not affect the batch size.
+        layer_dense(units = 128, activation = "relu") %>% # Set hidden layers with relu activation function
+        layer_dense(units = 128, activation = "relu") %>%
+        layer_dense(units = 128, activation = "relu") %>%
+        layer_dense(units = 128, activation = "relu") %>%
+        layer_dense(units = 128, activation = "relu") %>%
+        layer_dense(units = 128, activation = "relu") %>%
+        layer_dropout(0.2) %>% # Set momentumn
+        layer_dense(3, activation = "softmax") # Set output layer
+summary(model)
+model %>%
+        compile(
+                loss = "sparse_categorical_crossentropy",
+                optimizer = "adam",
+                metrics = "accuracy"
+        )
+model %>%
+        fit(
+                x = iris_as$train$x, y = iris_as$train$y,
+                epochs = 50,
+                validation_split = 0.3,
+                verbose = 2
+        )
+model %>%
+        evaluate(iris_as$test$x, iris_as$test$y, verbose = 0)
+```
+
+### `nnet` on `iris` Dataset
+
+```{r}
+iris_rand <- iris[order(runif(dim(iris)[1])),]
+train<-(iris_rand[1:100,])
+test<-(iris_rand[101:150,])
+
+iris.nn <- nnet(Species ~ ., data = train, size = 5, rang = 0.1, decay = 5e-4, maxit = 200)
+iris.predict <- predict(iris.nn, test, type = "class")
+table(test$Species,iris.predict)
+```
+
+### `Torch` HelloWorld
+
+```{r,eval=FALSE}
+library(palmerpenguins)
+penguins_dataset <- dataset(
+        name = "penguins_dataset",
+        initialize = function(df) {
+          df <- na.omit(df)
+          # continuous input data (x_cont)
+          x_cont <- df[, c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "year")] %>%
+                  as.matrix()
+          self$x_cont <- torch_tensor(x_cont)
+          # categorical input data (x_cat)
+          x_cat <- df[, c("island", "sex")]
+          x_cat$island <- as.integer(x_cat$island)
+          x_cat$sex <- as.integer(x_cat$sex)
+          self$x_cat <- as.matrix(x_cat) %>% torch_tensor()
+          # target data (y)
+          species <- as.integer(df$species)
+          self$y <- torch_tensor(species)
+        },
+        .getitem = function(i) {
+          list(x_cont = self$x_cont[i,], x_cat = self$x_cat[i,], y = self$y[i])
+        },
+        .length = function() {
+          self$y$size()[[1]]
+        }
+)
+train_indices <- sample(seq_len(nrow(penguins)), 250)
+train_ds <- penguins_dataset(penguins[train_indices,])
+valid_ds <- penguins_dataset(penguins[setdiff(seq_len(nrow(penguins)), train_indices),])
+train_dl <- train_ds %>% dataloader(batch_size = 16, shuffle = TRUE)
+valid_dl <- valid_ds %>% dataloader(batch_size = 16, shuffle = FALSE)
+embedding_module <- nn_module(
+        initialize = function(cardinalities) {
+          self$embeddings <- nn_module_list(lapply(cardinalities, function(x) nn_embedding(num_embeddings = x, embedding_dim = ceiling(x / 2))))
+        },
+        forward = function(x) {
+          embedded <- vector(mode = "list", length = length(self$embeddings))
+          for (i in seq_along(self$embeddings)) {
+            embedded[[i]] <- self$embeddings[[i]](x[, i])
+          }
+          torch_cat(embedded, dim = 2)
+        }
+)
+net <- nn_module(
+        "penguin_net",
+        initialize = function(cardinalities,
+                              n_cont,
+                              fc_dim,
+                              output_dim) {
+          self$embedder <- embedding_module(cardinalities)
+          self$fc1 <- nn_linear(sum(purrr::map(cardinalities, function(x) ceiling(x / 2)) %>% unlist()) + n_cont, fc_dim)
+          self$output <- nn_linear(fc_dim, output_dim)
+        },
+
+        forward = function(x_cont, x_cat) {
+          embedded <- self$embedder(x_cat)
+          all <- torch_cat(list(embedded, x_cont$to(dtype = torch_float())), dim = 2)
+          all %>%
+                  self$fc1() %>%
+                  nnf_relu() %>%
+                  self$output() %>%
+                  nnf_log_softmax(dim = 2)
+        }
+)
+model <- net(
+        cardinalities = c(length(levels(penguins$island)), length(levels(penguins$sex))),
+        n_cont = 5,
+        fc_dim = 32,
+        output_dim = 3
+)
+optimizer <- optim_adam(model$parameters, lr = 0.01)
+
+for (epoch in 1:20) {
+  model$train()
+  train_losses <- c()
+  coro::loop(for (b in train_dl) {
+    optimizer$zero_grad()
+    output <- model(b$x_cont, b$x_cat)
+    loss <- nnf_nll_loss(output, b$y)
+    loss$backward()
+    optimizer$step()
+    train_losses <- c(train_losses, loss$item())
+  })
+  model$eval()
+  valid_losses <- c()
+  coro::loop(for (b in valid_dl) {
+    output <- model(b$x_cont, b$x_cat)
+    loss <- nnf_nll_loss(output, b$y)
+    valid_losses <- c(valid_losses, loss$item())
+  })
+  cat(sprintf("Loss at epoch %d: training: %3.3f, validation: %3.3f\n", epoch, mean(train_losses), mean(valid_losses)))
+}
+```
+
+## Decision-Making Tree
+### `C50` on `iris` Dataset
+
+```{r}
+iris_rand <- iris[order(runif(dim(iris)[1])),]
+train<-(iris_rand[1:100,])
+test<-(iris_rand[101:150,])
+iris.c50 <- C5.0(train[,c("Petal.Width","Petal.Length","Sepal.Width","Sepal.Length")],train$Species)
+iris.predict <- predict(iris.c50, test, type = "class")
+table(test$Species,iris.predict)
+```
 
 # TODO
 
 `aov`
 
 Machine learning
+
+# What we Have Now?
+
+```{r}
+sessionInfo()
+```
